@@ -13,7 +13,7 @@ namespace Index\Upgrade2;
 use Kotchasan\Http\Request;
 
 /**
- * อัปเกรด.
+ * ติดตั้ง.
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -22,48 +22,33 @@ use Kotchasan\Http\Request;
 class View extends \Gcms\View
 {
     /**
-     * อัปเกรด.
+     * step 2.
      *
      * @return string
      */
-    public function render(Request $request)
+    public function render(Request $request, $error = '')
     {
         $content = array();
         if (defined('INSTALL')) {
+            $password = $request->session('password', 'admin')->topic();
+            $email = $request->session('email', 'admin@'.$request->getUri()->getHost())->url();
+            $content[] = '<form method=post action=index.php autocomplete=off>';
             $content[] = '<h2>{TITLE}</h2>';
-            $content[] = '<p>อัปเกรดเรียบร้อย ก่อนการใช้งานกรุณาตรวจสอบค่าติดตั้งต่างๆให้เรียบร้อยก่อน ทั้งการตั้งค่าเว็บไซต์ และการตั้งค่าโมดูล หากคุณต้องการความช่วยเหลือ คุณสามารถ ติดต่อสอบถามได้ที่ <a href="https://goragod.com" target="_blank">https://goragod.com</a> หรือ <a href="http://gcms.in.th" target="_blank">http://gcms.in.th</a></p>';
-            $content[] = '<ul>';
-            // ตรวจสอบการเชื่อมต่อฐานข้อมูล
-            $db = \Kotchasan\Database::create(array(
-                'username' => $_SESSION['cfg']['db_username'],
-                'password' => $_SESSION['cfg']['db_password'],
-                'dbname' => $_SESSION['cfg']['db_name'],
-                'hostname' => $_SESSION['cfg']['db_server'],
-                'prefix' => $_SESSION['prefix'],
-            ));
-            if (!$db->connection()) {
-                return createClass('Index\Dberror\View')->render($request);
+            $content[] = '<p>กรอกข้อมูลส่วนตัวของผู้ดูแลระบบ สำหรับใช้ในการเข้าสู่ระบบ</p>';
+            if (!empty($error)) {
+                $content[] = '<p class=warning>'.$error.'</p>';
             }
-            $new_version = self::$cfg->new_version;
-            $current_version = self::$cfg->version;
-            while ($current_version != $new_version) {
-                $ret = \Index\Upgrading\Model::upgrade($db, $current_version);
-                $content[] = $ret->content;
-                $current_version = $ret->version;
-            }
-            self::$cfg->version = $current_version;
-            unset(self::$cfg->new_version);
-            $f = \Gcms\Config::save(self::$cfg, CONFIG);
-            $content[] = '<li class="'.($f ? 'correct' : 'incorrect').'">Update file <b>config.php</b> ...</li>';
-            $content[] = '</ul>';
-            $content[] = '<p class=warning>กรุณาลบโฟลเดอร์ <em>install/</em> ออกจาก Server ของคุณ</p>';
-            $content[] = '<p>เมื่อเรียบร้อยแล้ว กรุณา<b>เข้าระบบผู้ดูแล</b>เพื่อตั้งค่าที่จำเป็นอื่นๆโดยใช้ขื่ออีเมลและรหัสผ่านเก่าของคุณ</p>';
-            $content[] = '<p class=error><b>คำเตือน</b> ตัวอัปเกรด ไม่สามารถนำเข้าข้อมูลได้ทุกอย่าง หลังการอัปเกรด จะต้องตรวจสอบค่ากำหนดต่างๆ ให้ถูกต้องด้วยตัวเองอีกครั้ง เช่น การตั้งค่าเว็บไซต์ การตั้งค่าโมดูล และ การตั้งค่าหมวดของหมวดหมู่ต่างๆ</p>';
-            $content[] = '<p><a href="'.WEB_URL.'admin/index.php?module=system" class="button large admin">เข้าระบบผู้ดูแล</a></p>';
+            $content[] = '<p class=item><label for=email>ที่อยู่อีเมล</label><span class="g-input icon-email"><input type=email size=70 id=email name=email maxlength=255 value="'.$email.'" autofocus required></span></p>';
+            $content[] = '<p class="comment">ที่อยู่อีเมลสำหรับผู้ดูแลระบบสูงสุด ใช้ในการการเข้าระบบ</p>';
+            $content[] = '<p class=item><label for=password>รหัสผ่าน</label><span class="g-input icon-password"><input type=text size=70 id=password name=password maxlength=20 value="'.$password.'" required></span></p>';
+            $content[] = '<p class="row comment">ภาษาอังกฤษตัวพิมพ์เล็กและตัวเลข 4-8 หลัก</p>';
+            $content[] = '<input type=hidden name=step value=3>';
+            $content[] = '<p><input class="button large save" type=submit value="ดำเนินการต่อ"></p>';
+            $content[] = '</form>';
         }
 
         return (object) array(
-            'title' => 'อัปเกรด GCMS เป็นเวอร์ชั่น '.self::$cfg->version.' เรียบร้อย',
+            'title' => 'ข้อมูลสมาชิกผู้ดูแลระบบ',
             'content' => implode('', $content),
         );
     }

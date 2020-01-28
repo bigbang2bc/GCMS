@@ -47,12 +47,12 @@ class View extends \Gcms\Adminview
         ));
         $group = $fieldset->add('groups-table', array(
             'label' => '{LNG_Youtube ID}',
-            'for' => 'youtube',
+            'for' => 'write_youtube',
             'comment' => '{LNG_Enter the ID of the video from Youtube 11 characters eg 17IKhjQWT9M (Without a complete URL)}',
         ));
         $group->add('label', array(
             'class' => 'width',
-            'for' => 'youtube',
+            'for' => 'write_youtube',
             'innerHTML' => 'http://www.youtube.com/watch?v=',
         ));
         // youtube
@@ -60,6 +60,7 @@ class View extends \Gcms\Adminview
             'id' => 'write_youtube',
             'itemClass' => 'width',
             'maxlength' => 11,
+            'placeholder' => '17IKhjQWT9M',
             'value' => isset($index->youtube) ? $index->youtube : '',
         ));
         // thumb

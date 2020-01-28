@@ -42,7 +42,7 @@ class View extends \Gcms\Adminview
         $this->publisheds = Language::get('MENU_PUBLISHEDS');
         // menu ที่เลือก default คือ MAINMENU
         $parent = $request->request('parent')->toString();
-        $installed_menus = Language::find('MENU_PARENTS', array('MAINMENU' => 'Main menu'));
+        $installed_menus = Language::get('MENU_PARENTS');
         $menus = array_keys($installed_menus);
         $parent = in_array($parent, $menus) ? $parent : reset($menus);
         $this->toplvl = -1;
@@ -157,7 +157,6 @@ class View extends \Gcms\Adminview
      */
     public function onRow($item, $o, $prop)
     {
-        $url = empty($item['menu_url']) ? WEB_URL.'index.php?module='.$item['module'] : $item['menu_url'];
         $text = '';
         for ($i = 0; $i < $item['level']; ++$i) {
             $text .= '&nbsp;&nbsp;&nbsp;';

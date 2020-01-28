@@ -11,7 +11,6 @@
 namespace Board\Export;
 
 use Gcms\Gcms;
-use Kotchasan\Date;
 use Kotchasan\Grid;
 use Kotchasan\Http\Request;
 use Kotchasan\Template;
@@ -62,9 +61,9 @@ class View extends \Gcms\View
                         // รูปภาพของความคิดเห็น
                         $picture = $item->picture != '' && is_file($imagedir.$item->picture) ? '<figure><img src="'.$imageurl.$item->picture.'" alt="'.$index->topic.'"></figure>' : '';
                         $listitem->add(array(
-                            '/{DETAIL}/' => $picture.Gcms::showDetail(str_replace(array('{', '}'), array('&#x007B;', '&#x007D;'), nl2br($item->detail)), $canView, true),
+                            '/{DETAIL}/' => $picture.Gcms::showDetail(str_replace(array('{WEBURL}', '{', '}'), array(WEB_URL, '&#x007B;', '&#x007D;'), nl2br($item->detail)), $canView, true),
                             '/{DISPLAYNAME}/' => $item->displayname,
-                            '/{DATE}/' => Date::format($item->last_update),
+                            '/{DATE}/' => $item->last_update,
                             '/{IP}/' => Gcms::showip($item->ip, $login),
                             '/{NO}/' => $no + 1,
                         ));
@@ -73,12 +72,12 @@ class View extends \Gcms\View
                 // รูปภาพในกระทู้
                 $picture = empty($index->image_src) ? '' : '<figure><img src="'.$index->image_src.'" alt="'.$index->topic.'"></figure>';
                 // เนื้อหา
-                $detail = Gcms::showDetail(str_replace(array('{', '}'), array('&#x007B;', '&#x007D;'), nl2br($index->detail)), $canView, true);
+                $detail = Gcms::showDetail(str_replace(array('{WEBURL}', '{', '}'), array(WEB_URL, '&#x007B;', '&#x007D;'), nl2br($index->detail)), $canView, true);
                 $replace = array(
                     '/{COMMENTLIST}/' => isset($listitem) ? $listitem->render() : '',
                     '/{TOPIC}/' => $index->topic,
                     '/{DETAIL}/' => $picture.$detail,
-                    '/{DATE}/' => Date::format($index->create_date),
+                    '/{DATE}/' => $index->create_date,
                     '/{URL}/' => \Board\Index\Controller::url($index->module, $index->id),
                     '/{DISPLAYNAME}/' => $index->name,
                 );

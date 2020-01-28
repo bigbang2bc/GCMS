@@ -51,8 +51,12 @@ class View extends \Gcms\View
             '/{TOPIC}/' => $index->topic,
             '/{SUBTITLE}/' => $index->description,
             '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
+            '/{WEBTITLE}/' => self::$cfg->web_title,
+            '/{WEBURL}/' => WEB_URL,
+            '/{ICON}/' => Gcms::usernameIcon(),
+            '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
         ));
-        $index->detail = $template->render();
+        $index->detail = Language::trans($template->render());
         $index->keywords = $index->topic;
         if (isset(Gcms::$view)) {
             Gcms::$view->addBreadcrumb($index->canonical, $sign_in);

@@ -5,7 +5,11 @@
   <fieldset>
     <div class=item>
       <label for=register_email>{LNG_Email}/Facebook ID</label>
-      <span class="g-input icon-email"><input type=text name=register_email id=register_email maxlength=255 readonly value="{EMAIL}"></span>
+      <span class="g-input icon-email"><input type=text name=register_email id=register_email {EDITEMAIL} value="{EMAIL}"></span>
+    </div>
+    <div class=item>
+      <label for=register_phone1>{LNG_Phone}</label>
+      <span class="g-input icon-phone"><input type=text name=register_phone1 id=register_phone1 {EDITPHONE} value="{PHONE1}"></span>
     </div>
     <div class=item>
       <label for=register_displayname>{LNG_Displayname}</label>
@@ -30,22 +34,18 @@
       <span class="g-input icon-world"><input type=text name=register_website id=register_website maxlength=255 value="{WEBSITE}" title="{LNG_Your site&#039;s URL (include http://)}"></span>
       <div class=comment id=result_register_website>{LNG_Your site&#039;s URL (include http://)}</div>
     </div>
-    <!--<div class=item>
-      <label for=register_idcard>{LNG_Identification number}</label>
+    <div class=item>
+      <label for=register_idcard>{LNG_Identification No.}</label>
       <span class="g-input icon-profile"><input type=number name=register_idcard id=register_idcard maxlength=13 value="{IDCARD}" title="{LNG_13-digit identification number}"></span>
       <div class=comment id=result_register_idcard>{LNG_13-digit identification number}</div>
-    </div>-->
+    </div>
     <div class=item>
       <label for=register_birthday>{LNG_Birthday}</label>
       <span class="g-input icon-calendar"><input type=date id=register_birthday name=register_birthday value="{BIRTHDAY}" title="{LNG_Birthday}"></span>
     </div>
     <div class=item>
       <label for="register_company">{LNG_Company}</label>
-      <span class="g-input icon-address"><input id="register_company" placeholder="{LNG_Your Workplace}" maxlength="255" type="text" name="register_company" value="{COMPANY}"></span>
-    </div>
-    <div class=item>
-      <label for=register_phone1>{LNG_Phone}</label>
-      <span class="g-input icon-phone"><input type=text name=register_phone1 id=register_phone1 maxlength=10 value="{PHONE1}" title="{LNG_Phone}" pattern="[0-9]+"></span>
+      <span class="g-input icon-address"><input id="register_company" placeholder="{LNG_Your workplace}" maxlength="255" type="text" name="register_company" value="{COMPANY}"></span>
     </div>
     <div class=item>
       <label for=register_phone2>{LNG_Phone}/{LNG_Fax}</label>

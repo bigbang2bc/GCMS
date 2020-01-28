@@ -134,9 +134,9 @@ class View
             $a .= ' title="'.$b.'"';
         }
         if ($arrow) {
-            return '<li'.$c.'><a class=menu-arrow'.$a.'><span>'.(empty($menu_text) ? '&nbsp;' : htmlspecialchars_decode($menu_text)).'</span></a>';
+            return '<li'.$c.'><a class=menu-arrow'.$a.'><span>'.(empty($menu_text) ? '&nbsp;' : strip_tags(htmlspecialchars_decode($menu_text))).'</span></a>';
         } else {
-            return '<li'.$c.'><a'.$a.'><span>'.(empty($menu_text) ? '&nbsp;' : htmlspecialchars_decode($menu_text)).'</span></a>';
+            return '<li'.$c.'><a'.$a.'><span>'.(empty($menu_text) ? '&nbsp;' : strip_tags(htmlspecialchars_decode($menu_text))).'</span></a>';
         }
     }
 }

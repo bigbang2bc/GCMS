@@ -50,7 +50,7 @@ GBanner.prototype = {
     });
     this.buttons = $G(this.slideshow.create("div"));
     this.buttons.style.zIndex = 2;
-    this.buttons.className = "button_wrapper";
+    this.buttons.className = this.options.touchThumbnail ? 'button_wrapper_thumbnail' : 'button_wrapper';
     this.button = $G(this.buttons.create("div"));
     this.button.className = "button_container scroll";
     this.button.style.position = "relative";
@@ -61,6 +61,7 @@ GBanner.prototype = {
     this.drag = false;
     if (this.options.touchThumbnail) {
       new GDragMove(this.button, this.buttons, {
+        srcOnly: false,
         beginDrag: function(e) {
           tmp.button.className = "button_container";
           return true;
@@ -69,8 +70,7 @@ GBanner.prototype = {
           tmp.drag = true;
           var l = tmp.buttons.getWidth() - tmp.button.getWidth();
           if (l < 0) {
-            tmp.button.style.left =
-              Math.min(0, Math.max(l, e.mousePos.x - e.mouseOffset.x)) + "px";
+            tmp.button.style.left = Math.min(0, Math.max(l, e.mousePos.x - e.mouseOffset.x)) + "px";
           }
         },
         endDrag: function() {
@@ -222,16 +222,13 @@ GBanner.prototype = {
         w = current.getWidth();
       if (bw > cw) {
         if (l + w > cw) {
-          tmp.button.style.left =
-            Math.min(0, Math.max(cw - bw, cw - (id + 1) * w)) + "px";
+          tmp.button.style.left = Math.min(0, Math.max(cw - bw, cw - (id + 1) * w)) + "px";
         } else if (l < 0) {
-          tmp.button.style.left =
-            Math.min(0, Math.max(cw - bw, -id * w)) + "px";
+          tmp.button.style.left = Math.min(0, Math.max(cw - bw, -id * w)) + "px";
         }
       }
       tmp.prev.style.left = id == 0 ? -tmp.prev.getWidth() + "px" : "0.5em";
-      tmp.next.style.right =
-        id == tmp.datas.length - 1 ? -tmp.next.getWidth() + "px" : "0.5em";
+      tmp.next.style.right = id == tmp.datas.length - 1 ? -tmp.next.getWidth() + "px" : "0.5em";
     }, 1);
   }
 };

@@ -12,7 +12,6 @@ namespace Index\Address;
 
 use Kotchasan\Country;
 use Kotchasan\Http\Request;
-use Kotchasan\Orm\Recordset;
 use Kotchasan\Province;
 use Kotchasan\Template;
 
@@ -36,8 +35,11 @@ class View extends \Gcms\View
     public function render(Request $request, $index)
     {
         // อ่านข้อมูลสมาชิก
-        $rs = Recordset::create('Index\User\Model');
-        $user = $rs->where((int) $_SESSION['login']['id'])->first('id', 'provinceID', 'country', 'name', 'address1', 'address2', 'province', 'zipcode');
+        $user = \Kotchasan\Model::createQuery()
+            ->from('user U')
+            ->where(array('U.id', (int) $_SESSION['login']['id']))
+            ->first('U.id', 'U.name', 'U.address1', 'U.address2', 'U.provinceID', 'U.zipcode', 'U.country', 'U.province');
+        // member/address.html
         $template = Template::create('member', 'member', 'address');
         $contents = array();
         // ข้อมูลฟอร์ม

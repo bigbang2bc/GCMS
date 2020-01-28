@@ -284,7 +284,7 @@ class Gcms extends \Kotchasan\KBase
     }
 
     /**
-     * ฟังก์ชั่นคืนค่าข้อความ placeholder ของช่อง login.
+     * ฟังก์ชั่นคืนค่าข้อความ placeholder ของช่อง login
      *
      * @return string
      */
@@ -294,7 +294,7 @@ class Gcms extends \Kotchasan\KBase
             'email' => '{LNG_Email}',
             'username' => '{LNG_Username}',
             'phone1' => '{LNG_Phone}',
-            'idcard' => '{LNG_Identification number}',
+            'idcard' => '{LNG_Identification No.}',
         );
         $placeholder = array();
         foreach (self::$cfg->login_fields as $item) {
@@ -303,7 +303,7 @@ class Gcms extends \Kotchasan\KBase
             }
         }
 
-        return implode('/', $placeholder);
+        return Language::trans(implode('/', $placeholder));
     }
 
     /**
@@ -553,6 +553,25 @@ class Gcms extends \Kotchasan\KBase
             return $ips[1].preg_replace('/[0-9]/', 'x', $ips[2]);
         } else {
             return $ip;
+        }
+    }
+
+    /**
+     * คืนค่าชื่อไอคอนสำหรับช่อง username
+     * เข้าระบบได้ทั้ง email และ phone1 คืนค่า user
+     * เข้าระบบได้เฉพาะ email คืนค่า email
+     * เข้าระบบได้เฉพาะ phone1 คืนค่า phone
+     *
+     * @return string
+     */
+    public static function usernameIcon()
+    {
+        $email = in_array('email', self::$cfg->login_fields);
+        $phone = in_array('phone1', self::$cfg->login_fields);
+        if ($email && $phone) {
+            return 'user';
+        } else {
+            return $email ? 'email' : 'phone';
         }
     }
 

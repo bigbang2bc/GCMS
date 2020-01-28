@@ -34,10 +34,9 @@ class Index extends \Kotchasan\Model
      */
     public static function get($id, $rows, $cols)
     {
-        $model = new static();
         if ($id > 0) {
             // อ่านโมดูล จาก id ของ บทความ
-            $index = $model->db()->createQuery()
+            $index = static::createQuery()
                 ->from('index Q')
                 ->join('index_detail D', 'INNER', array(
                     array('D.id', 'Q.id'),
@@ -66,30 +65,30 @@ class Index extends \Kotchasan\Model
                     array('Q.id', '>', $id),
                     Sql::create(implode(' OR ', $qs)),
                     array('D.language', array(Language::name(), '')),
+                    array('Q.id', '!=', $id),
                 );
                 $limit = $rows * $cols;
                 // newest
-                $q1 = $model->db()->createQuery()
+                $q1 = static::createQuery()
                     ->select($select)
                     ->from('index Q')
                     ->join('index_detail D', 'INNER', array(array('D.id', 'Q.id'), array('D.module_id', 'Q.module_id')))
                     ->where($where)
-                    ->order('Q.create_date')
-                    ->limit($limit);
+                    ->order('Q.create_date');
                 $sql1 = 'SELECT @n:=@n+1 AS `row`,Q.* FROM ('.$q1->text().') AS Q, (SELECT @n:=0) AS R';
                 // older
                 $where[4][1] = '<';
                 $q1->select($select)
                     ->where($where)
-                    ->order('Q.create_date DESC')
-                    ->limit($limit);
+                    ->order('Q.create_date DESC');
                 $sql2 = 'SELECT @m:=@m+1 AS `row`,Q.* FROM ('.$q1->text().') AS Q, (SELECT @m:=0) AS L';
-                $sql3 = $model->db()->createQuery()
+                $sql3 = static::createQuery()
                     ->select()
                     ->from(array("($sql1) UNION ($sql2)", 'N'))
+                    ->groupBy('N.id')
                     ->order('N.row')
                     ->limit($limit);
-                $query = $model->db()->createQuery()
+                $query = static::createQuery()
                     ->select('Y.id', 'Y.topic', 'Y.alias', 'Y.picture', 'Y.comment_date', 'Y.last_update', 'Y.create_date', 'Y.description', 'Y.comments', 'Y.visited')
                     ->from(array($sql3, 'Y'))
                     ->order('Y.create_date');

@@ -15,7 +15,7 @@ use Kotchasan\Html;
 use Kotchasan\Language;
 
 /**
- * ฟอร์มตั้งค่า system.
+ * module=system
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -24,7 +24,7 @@ use Kotchasan\Language;
 class View extends \Gcms\Adminview
 {
     /**
-     * module=system.
+     * ฟอร์มตั้งค่าระบบ
      *
      * @param object $config
      *
@@ -32,7 +32,6 @@ class View extends \Gcms\Adminview
      */
     public function render($config)
     {
-        // form
         $form = Html::create('form', array(
             'id' => 'setup_frm',
             'class' => 'setup_frm',
@@ -203,7 +202,7 @@ class View extends \Gcms\Adminview
             'id' => 'member_idcard',
             'labelClass' => 'g-input icon-profile',
             'itemClass' => 'width50',
-            'label' => '{LNG_Identification number}',
+            'label' => '{LNG_Identification No.}',
             'options' => $options,
             'value' => isset($config->member_idcard) ? $config->member_idcard : self::$cfg->member_idcard,
         ));

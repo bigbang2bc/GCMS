@@ -75,7 +75,7 @@ class Model extends \Kotchasan\Model
                 $users[$item->email] = array(
                     'id' => $item->id,
                     'email' => $item->email,
-                    'password' => sha1($item->password.$item->email),
+                    'password' => sha1(self::$cfg->password_key.$item->password.$item->email),
                     'name' => $item->name,
                     'displayname' => $item->nic_name,
                     'address1' => $item->address,

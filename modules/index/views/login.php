@@ -10,7 +10,9 @@
 
 namespace Index\Login;
 
+use Gcms\Gcms;
 use Gcms\Login;
+use Kotchasan\Language;
 use Kotchasan\Template;
 
 /**
@@ -48,7 +50,6 @@ class View extends \Gcms\View
             $template = Template::create('member', 'member', 'memberfrm');
         }
         $template->add(array(
-            '/{LNG_([^}]+)}/e' => '\Kotchasan\Language::parse(array(1=>"$1"))',
             '/{WEBTITLE}/' => self::$cfg->web_title,
             '/{SUBTITLE}/' => empty(Login::$login_message) ? self::$cfg->web_description : '<span class=error>'.Login::$login_message.'</span>',
             '/{DISPLAYNAME}/' => empty($login['displayname']) ? (empty($login['email']) ? 'Unname' : $login['email']) : $login['displayname'],
@@ -57,10 +58,10 @@ class View extends \Gcms\View
             '/{ADMIN}/' => Login::adminAccess() ? '' : 'hidden',
             '/{TOKEN}/' => self::$request->createToken(),
             '/{WEBURL}/' => WEB_URL,
-            '/:name/' => self::$cfg->member_status[1],
+            '/{NAME}/' => self::$cfg->member_status[1],
         ));
 
-        return $template->render();
+        return Language::trans($template->render());
     }
 
     /**
@@ -75,7 +76,7 @@ class View extends \Gcms\View
             $template = Template::create('member', 'member', 'loginfrm');
         }
         $template->add(array(
-            '/{LNG_([^}]+)}/e' => '\Kotchasan\Language::parse(array(1=>"$1"))',
+            '/{WEBTITLE}/' => self::$cfg->web_title,
             '/{SUBTITLE}/' => empty(Login::$login_message) ? self::$cfg->web_description : '<span class=error>'.Login::$login_message.'</span>',
             '/{EMAIL}/' => isset(Login::$login_params['username']) ? Login::$login_params['username'] : '',
             '/{PASSWORD}/' => isset(Login::$login_params['password']) ? Login::$login_params['password'] : '',
@@ -83,8 +84,11 @@ class View extends \Gcms\View
             '/{PLACEHOLDER}/' => \Gcms\Gcms::getLoginPlaceholder(),
             '/{FACEBOOK}/' => empty(self::$cfg->facebook_appId) ? 'hidden' : 'facebook',
             '/{GOOGLE}/' => empty(self::$cfg->google_client_id) ? 'hidden' : 'google',
+            '/{WEBURL}/' => WEB_URL,
+            '/{ICON}/' => Gcms::usernameIcon(),
+            '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
         ));
 
-        return $template->render();
+        return Language::trans($template->render());
     }
 }

@@ -17,7 +17,7 @@ use Kotchasan\Http\Request;
 use Kotchasan\Language;
 
 /**
- * module=system.
+ * module=system
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -56,6 +56,7 @@ class Controller extends \Gcms\Controller
             $config = Config::load(CONFIG);
             // แสดงฟอร์ม
             $section->appendChild(createClass('Index\System\View')->render($config));
+            // คืนค่า HTML
 
             return $section->render();
         }

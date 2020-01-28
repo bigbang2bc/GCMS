@@ -34,12 +34,12 @@ class Controller extends \Gcms\Controller
      */
     public function render(Request $request)
     {
+        // ไตเติล
+        $this->title = Language::get('Dashboard');
+        // เมนู
+        $this->menu = 'home';
         // แอดมิน
         if ($login = Login::adminAccess()) {
-            // ข้อความ title bar
-            $this->title = Language::get('Dashboard');
-            // เลือกเมนู
-            $this->menu = 'home';
             // แสดงผล
             $section = Html::create('section');
             // breadcrumbs

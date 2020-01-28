@@ -58,28 +58,30 @@ class Model extends \Kotchasan\Model
                         // ไม่ได้กรอกรายละเอียด
                         $ret['ret_reply_detail'] = 'Please fill in';
                     } elseif ($id == 0) {
+                        // คอลัมน์ที่เป็น username
+                        $field = self::$cfg->login_fields[0];
                         // ใหม่ ตรวจสอบการ login
                         if ($login) {
                             // login ใช้ข้อมูลของคน login
                             $post['member_id'] = $login['id'];
-                            $post['email'] = $login['email'];
-                            $post['sender'] = empty($login['displayname']) ? $login['email'] : $login['displayname'];
+                            $post['email'] = $login[$field];
+                            $post['sender'] = empty($login['displayname']) ? $login[$field] : $login['displayname'];
                         } else {
                             // ตรวจสอบการ login
-                            $email = $request->post('reply_email')->url();
+                            $username = $request->post('reply_email')->url();
                             $password = $request->post('reply_password')->password();
-                            if ($email == '') {
-                                // ไม่ได้กรอกอีเมล
+                            if ($username == '') {
+                                // ไม่ได้กรอก username
                                 $ret['ret_reply_email'] = 'Please fill in';
                             }
                             if ($password == '' && !$guest) {
                                 // สมาชิกเท่านั้น และ ไม่ได้กรอกรหัสผ่าน
                                 $ret['ret_reply_password'] = 'Please fill in';
                             }
-                            if ($email != '' && $password != '') {
-                                // ตรวจสอบ user และ password
+                            if ($username != '' && $password != '') {
+                                // ตรวจสอบ username และ password
                                 $user = Login::checkMember(array(
-                                    'username' => $email,
+                                    'username' => $username,
                                     'password' => $password,
                                 ));
                                 if (is_string($user)) {
@@ -96,26 +98,26 @@ class Model extends \Kotchasan\Model
                                 } else {
                                     // สมาชิก สามารถแสดงความคิดเห็นได้
                                     $post['member_id'] = $user['id'];
-                                    $post['email'] = $user['email'];
-                                    $post['sender'] = empty($user['displayname']) ? $user['email'] : $user['displayname'];
+                                    $post['email'] = $username;
+                                    $post['sender'] = empty($user['displayname']) ? $username : $user['displayname'];
                                 }
                             } elseif ($guest) {
-                                // ตรวจสอบอีเมลซ้ำกับสมาชิก สำหรับบุคคลทั่วไป
+                                // ตรวจสอบ user ซ้ำกับสมาชิก สำหรับบุคคลทั่วไป
                                 $search = $this->db()->createQuery()
                                     ->from('user')
-                                    ->where(array('email', $email))
+                                    ->where(array($field, $username))
                                     ->first('id');
                                 if ($search) {
-                                    // พบอีเมล ต้องการ password
+                                    // พบ username ต้องการ password
                                     $ret['ret_reply_password'] = 'Please fill in';
-                                } elseif (!Validator::email($email)) {
-                                    // อีเมลไม่ถูกต้อง
+                                } elseif ($field === 'email' && !Validator::email($username)) {
+                                    // email ไม่ถูกต้อง
                                     $ret['ret_reply_email'] = Language::replace('Invalid :name', array(':name' => Language::get('Email')));
                                 } else {
                                     // guest
                                     $post['member_id'] = 0;
-                                    $post['email'] = $email;
-                                    $post['sender'] = $email;
+                                    $post['email'] = $username;
+                                    $post['sender'] = $username;
                                 }
                             } else {
                                 // สมาชิกเท่านั้น

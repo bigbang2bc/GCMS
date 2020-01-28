@@ -72,7 +72,7 @@ class Controller extends \Kotchasan\Controller
                 $info = @getimagesize(ROOT_PATH.DATA_FOLDER.'image/'.self::$cfg->logo);
                 if ($info && $info[0] > 0 && $info[1] > 0) {
                     $logo = WEB_URL.DATA_FOLDER.'image/'.self::$cfg->logo;
-                    $img_logo = '<img src="'.$logo.'" alt="{WEBTITLE}">';
+                    $img_logo = '<img alt="{WEBTITLE}" src="'.$logo.'">';
                     Gcms::$site['logo'] = array(
                         '@type' => 'ImageObject',
                         'url' => $logo,
@@ -126,21 +126,19 @@ class Controller extends \Kotchasan\Controller
                 $page->image_src = Gcms::$site['logo']['url'];
             }
             if (!empty($page->image_src)) {
+                $info = getimagesize($page->image_src);
                 $meta['image_src'] = '<link rel="image_src" href="'.$page->image_src.'">';
                 $meta['og:image'] = '<meta property="og:image" content="'.$page->image_src.'">';
                 $meta['og:image:alt'] = '<meta property="og:image:alt" content="'.$page->topic.'">';
-                if (isset($page->image_width)) {
-                    $meta['og:image:width'] = '<meta property="og:image:width" content="'.$page->image_width.'">';
-                }
-                if (isset($page->image_height)) {
-                    $meta['og:image:height'] = '<meta property="og:image:height" content="'.$page->image_height.'">';
-                }
+                $meta['og:image:width'] = '<meta property="og:image:width" content="'.$info[0].'">';
+                $meta['og:image:height'] = '<meta property="og:image:height" content="'.$info[1].'">';
+                $meta['og:image:type'] = '<meta property="og:image:type" content="'.$info['mime'].'">';
             }
             if (!empty(self::$cfg->facebook_appId)) {
                 $meta['og:app_id'] = '<meta property="fb:app_id" content="'.self::$cfg->facebook_appId.'">';
             }
             if (isset($page->canonical)) {
-                $meta['canonical'] = '<meta name="canonical" content="'.$page->canonical.'">';
+                $meta['canonical'] = '<link rel="canonical" href="'.$page->canonical.'">';
                 $meta['og:url'] = '<meta property="og:url" content="'.$page->canonical.'">';
             }
             if (!empty(self::$cfg->google_site_verification)) {

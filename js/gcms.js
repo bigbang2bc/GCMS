@@ -69,7 +69,9 @@ function getCurrentURL() {
   }
   var us = new Array();
   for (var p in urls) {
-    us.push(urls[p]);
+    if (p != 'fbclid') {
+      us.push(urls[p]);
+    }
   }
   if (us.length > 0) {
     u += "?" + us.join("&");

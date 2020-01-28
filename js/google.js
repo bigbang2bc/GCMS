@@ -36,9 +36,7 @@ function initGoogleButton(button) {
             q.push("token=" + encodeURIComponent($E("token").value));
           }
           if ($E("login_action")) {
-            q.push(
-              "login_action=" + encodeURIComponent($E("login_action").value)
-            );
+            q.push("login_action=" + encodeURIComponent($E("login_action").value));
           }
           q.push("id=" + encodeURIComponent(profile.getId()));
           q.push("name=" + encodeURIComponent(profile.getName()));

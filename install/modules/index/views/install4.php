@@ -114,20 +114,20 @@ class View extends \Gcms\View
                     }
                 }
             }
+            // config
+            self::$cfg->password_key = uniqid();
+            self::$cfg->version = self::$cfg->new_version;
+            unset(self::$cfg->new_version);
+            self::$cfg->skin = 'rooser';
             // install Admin
             $salt = uniqid();
-            $sql = "INSERT INTO `$_SESSION[prefix]_user` (`id`, `password`, `email`, `salt`, `displayname`,`country`, `status`, `social`, `active`, `create_date`, `permission`) VALUES (1,'".sha1($_SESSION['password'].$salt)."','$_SESSION[email]', '$salt', 'Admin','TH',1,'0','1',".time().",'can_config');";
+            $sql = "INSERT INTO `$_SESSION[prefix]_user` (`id`, `password`, `email`, `salt`, `displayname`,`country`, `status`, `social`, `active`, `create_date`, `permission`) VALUES (1,'".sha1(self::$cfg->password_key.$_SESSION['password'].$salt)."','$_SESSION[email]', '$salt', 'Admin','TH',1,'0','1',".time().",'can_config');";
             $db->query($sql);
             if (!empty($_SESSION['typ'])) {
                 if (is_dir(ROOT_PATH.'install/demo/'.$_SESSION['typ'].'/datas/')) {
                     File::copyDirectory(ROOT_PATH.'install/demo/'.$_SESSION['typ'].'/datas/', ROOT_PATH.DATA_FOLDER);
                 }
             }
-            // config
-            self::$cfg->password_key = uniqid();
-            self::$cfg->version = self::$cfg->new_version;
-            unset(self::$cfg->new_version);
-            self::$cfg->skin = 'rooser';
             if (!empty($_SESSION['typ']) && file_exists(ROOT_PATH.'install/demo/'.$_SESSION['typ'].'/installer.php')) {
                 include ROOT_PATH.'install/demo/'.$_SESSION['typ'].'/installer.php';
                 $className = ucfirst($_SESSION['typ']).'\\Installer\\Model';

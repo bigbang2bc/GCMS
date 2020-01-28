@@ -42,14 +42,16 @@ class View extends \Gcms\View
         );
         $template = Template::create('member', 'member', 'forgotfrm');
         $template->add(array(
-            '/{LNG_([^}]+)}/e' => '\Kotchasan\Language::parse(array(1=>"$1"))',
+            '/{WEBTITLE}/' => self::$cfg->web_title,
             '/{TOPIC}/' => $index->topic,
             '/{EMAIL}/' => isset(Login::$login_params['username']) ? Login::$login_params['username'] : '',
             '/{WEBURL}/' => WEB_URL,
             '/{TOKEN}/' => $request->createToken(),
             '/{MODAL}/' => $modal ? 'true' : WEB_URL.'index.php',
+            '/{ICON}/' => Gcms::usernameIcon(),
+            '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
         ));
-        $index->detail = $template->render();
+        $index->detail = Language::trans($template->render());
         $index->keywords = $index->topic;
         if (isset(Gcms::$view)) {
             Gcms::$view->addBreadcrumb($index->canonical, Language::get('Forgot'));

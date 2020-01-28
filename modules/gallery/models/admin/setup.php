@@ -130,7 +130,7 @@ class Model extends \Kotchasan\Orm\Field
                     } elseif ($action === 'sort') {
                         // เรียงลำดับรูป
                         $album_id = $request->post('aid')->toInt();
-                        $count = 1;
+                        $count = 0;
                         foreach (explode(',', $id) as $id) {
                             // save
                             $model->db()->update($table_name, array(

@@ -33,6 +33,8 @@ class Controller extends \Kotchasan\Controller
             $page = createClass('Index\Register\View')->render($request, true);
         } elseif ($action === 'forgot') {
             $page = createClass('Index\Forgot\View')->render($request, true);
+        } elseif ($action === 'login') {
+            $page = createClass('Index\Dologin\View')->render($request);
         } else {
             // 404
             $page = createClass('Index\Error\Controller')->init('index');

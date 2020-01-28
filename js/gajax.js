@@ -139,19 +139,16 @@ window.$K = (function() {
                 }
                 if (obj.dataset["keyboard"]) {
                   obj.pattern = new RegExp("^(?:[" + obj.dataset["keyboard"].preg_quote() + "]+)$");
-                  if (obj.type == "integer" || obj.type == "currency") {
+                  if (obj.type == "integer" || obj.type == "currency" || obj.type == "number") {
                     new GInput(text, obj.dataset["keyboard"], function() {
-                      var val = floatval(this.value);
                       if (obj.min) {
-                        val = Math.max(obj.min, val);
+                        this.value = Math.max(obj.min, floatval(this.value));
                       }
                       if (obj.max) {
-                        val = Math.min(obj.max, val);
+                        this.value = Math.min(obj.max, floatval(this.value));
                       }
                       if (obj.type == "currency") {
-                        this.value = val.toFixed(2);
-                      } else {
-                        this.value = val;
+                        this.value = floatval(this.value).toFixed(2);
                       }
                     });
                   } else {
@@ -423,18 +420,13 @@ window.$K = (function() {
     return d;
   };
   Date.prototype.compare = function(d) {
-    var date, month, year;
     if (Object.isString(d)) {
-      var ds = d.replace(/\//g, '-').split("-");
-      year = floatval(ds[0]);
-      month = floatval(ds[1]) - 1;
-      date = floatval(ds[2]);
-    } else {
-      date = d.getDate();
-      month = d.getMonth();
-      year = d.getFullYear();
+      d = new Date(d.replace(/-/g, '/'));
     }
-    var dateStr = this.getDate(),
+    var date = d.getDate(),
+      month = d.getMonth(),
+      year = d.getFullYear(),
+      dateStr = this.getDate(),
       monthStr = this.getMonth(),
       yearStr = this.getFullYear(),
       theYear = yearStr - year,
@@ -1266,7 +1258,7 @@ window.$K = (function() {
       return this;
     },
     addEvent: function(t, f, c) {
-      var ts = t.split(" "),
+      var ts = t.split(/[\s,]/),
         input = this;
       forEach(ts, function(e) {
         if (input.addEventListener) {
@@ -2136,18 +2128,13 @@ window.$K = (function() {
       var self = this;
       window.setTimeout(function() {
         var dm = self.body.getDimensions(),
-          hOffset =
-          dm.height -
-          self.body.getClientHeight() +
-          parseInt(self.body.getStyle("marginTop")) +
-          parseInt(self.body.getStyle("marginBottom")) +
-          40,
+          hOffset = dm.height - self.body.getClientHeight() + parseInt(self.body.getStyle("marginTop")) + parseInt(self.body.getStyle("marginBottom")) + 40,
           h = document.viewport.getHeight() - hOffset;
         if (dm.height > h) {
           self.div.style.height = h + "px";
         }
         self.div.center();
-      }, 1);
+      }, 500);
       return this;
     },
     hide: function() {
@@ -2503,17 +2490,17 @@ window.$K = (function() {
   };
   window.GDrag = GClass.create();
   GDrag.prototype = {
-    initialize: function(src, move, options) {
+    initialize: function(src, options) {
       this.options = {
         beginDrag: $K.emptyFunction,
         moveDrag: $K.emptyFunction,
-        endDrag: $K.emptyFunction
+        endDrag: $K.emptyFunction,
+        srcOnly: true
       };
       for (var property in options) {
         this.options[property] = options[property];
       }
       this.src = $G(src);
-      this.move = $G(move);
       var self = this;
 
       function _mousemove(e) {
@@ -2521,19 +2508,14 @@ window.$K = (function() {
         self.options.moveDrag.call(self);
       }
 
-      function _selectstart(e) {
-        GEvent.stop(e);
-      }
-
-      function _dragstart(e) {
+      function cancelEvent(e) {
         GEvent.stop(e);
       }
 
       function _mouseup(e) {
         document.removeEvent("mouseup", _mouseup);
         document.removeEvent("mousemove", _mousemove);
-        document.removeEvent("selectstart", _selectstart);
-        document.removeEvent("dragstart", _dragstart);
+        document.removeEvent("selectstart dragstart", cancelEvent);
         if (self.src.releaseCapture) {
           self.src.releaseCapture();
         }
@@ -2542,26 +2524,25 @@ window.$K = (function() {
         self.options.endDrag.call(self.src);
       }
 
-      function _mousedown(event) {
+      function _mousedown(e) {
         var delay,
-          src = GEvent.element(event),
+          src = GEvent.element(e),
           temp = this;
 
-        function _cancelClick(event) {
+        function _cancelClick() {
           window.clearTimeout(delay);
           this.removeEvent("mouseup", _cancelClick);
         }
-        if (src == self.src && GEvent.isLeftClick(event)) {
-          GEvent.stop(event);
-          self.mousePos = GEvent.pointer(event);
+        if ((!self.options.srcOnly || src == self.src) && GEvent.isLeftClick(e)) {
+          GEvent.stop(e);
+          self.mousePos = GEvent.pointer(e);
           if (this.setCapture) {
             this.setCapture();
           }
           delay = window.setTimeout(function() {
             document.addEvent("mouseup", _mouseup);
             document.addEvent("mousemove", _mousemove);
-            document.addEvent("selectstart", _selectstart);
-            document.addEvent("dragstart", _dragstart);
+            document.addEvent("selectstart dragstart", cancelEvent);
             self.options.beginDrag.call(self);
           }, 100);
           temp.addEvent("mouseup", _cancelClick);
@@ -2571,11 +2552,11 @@ window.$K = (function() {
       }
       this.src.addEvent("mousedown", _mousedown);
 
-      function touchHandler(event) {
-        var touches = event.changedTouches,
+      function touchHandler(e) {
+        var touches = e.changedTouches,
           first = touches[0],
           type = "";
-        switch (event.type) {
+        switch (e.type) {
           case "touchstart":
             type = "mousedown";
             break;
@@ -2607,11 +2588,9 @@ window.$K = (function() {
           null
         );
         first.target.dispatchEvent(simulatedEvent);
-        event.preventDefault();
+        e.preventDefault();
       }
-      this.src.addEvent("touchstart", touchHandler, false);
-      this.src.addEvent("touchmove", touchHandler, false);
-      this.src.addEvent("touchend", touchHandler, false);
+      this.src.addEvent("touchstart touchmove touchend", touchHandler, false);
     }
   };
   window.GDragMove = GClass.create();
@@ -2620,7 +2599,8 @@ window.$K = (function() {
       this.options = {
         beginDrag: $K.resultFunction,
         moveDrag: $K.resultFunction,
-        endDrag: $K.emptyFunction
+        endDrag: $K.emptyFunction,
+        srcOnly: true
       };
       for (var property in options) {
         this.options[property] = options[property];
@@ -2667,9 +2647,10 @@ window.$K = (function() {
       var o = {
         beginDrag: _beginDrag,
         moveDrag: _moveDrag,
-        endDrag: _endDrag
+        endDrag: _endDrag,
+        srcOnly: this.options.srcOnly
       };
-      new GDrag(this.dragObj, this.dragObj, o);
+      new GDrag(this.dragObj, o);
     }
   };
   window.GTime = GClass.create();
@@ -4202,11 +4183,11 @@ window.$K = (function() {
     },
     add: function(a) {
       var img = $E(a);
-      img.id = this.imgs.length;
+      img.alt = this.imgs.length;
       this.imgs.push(img);
       var self = this;
       callClick(img, function() {
-        self.currentId = floatval(this.id);
+        self.currentId = floatval(this.alt);
         self.show(this, false);
         return false;
       });

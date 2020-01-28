@@ -114,10 +114,10 @@ class View extends \Gcms\Adminview
      *
      * @param $btn        string id ของ button
      * @param $attributes array  property ของปุ่ม
-     * @param $items      array  ข้อมูลในแถว
+     * @param $item      array  ข้อมูลในแถว
      */
-    public function onCreateButton($btn, $attributes, $items)
+    public function onCreateButton($btn, $attributes, $item)
     {
-        return $btn != 'delete' || $items['email_id'] == 0 ? $attributes : false;
+        return $btn != 'delete' || $item['email_id'] == 0 ? $attributes : false;
     }
 }

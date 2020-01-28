@@ -132,8 +132,8 @@ return array(
     1 => 'Can comments'
   ),
   'SEXES' => array(
-    'f' => 'femail',
-    'm' => 'mail'
+    'f' => 'female',
+    'm' => 'male'
   ),
   'SHOW_NEWS' => array(
     'news' => 'news'

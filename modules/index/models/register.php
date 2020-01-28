@@ -57,16 +57,34 @@ class Model extends \Kotchasan\Model
                 $user_table = $this->getTableName('user');
                 // database connection
                 $db = $this->db();
-                // อีเมล
-                if (empty($save['email'])) {
-                    $ret['ret_register_email'] = 'Please fill in';
-                } elseif (!Validator::email($save['email'])) {
-                    $ret['ret_register_email'] = Language::replace('Invalid :name', array(':name' => Language::get('Email')));
-                } else {
-                    // ตรวจสอบอีเมลซ้ำ
-                    $search = $db->first($user_table, array('email', $save['email']));
-                    if ($search !== false) {
-                        $ret['ret_register_email'] = Language::replace('This :name already exist', array(':name' => Language::get('Email')));
+                if (in_array('email', self::$cfg->login_fields)) {
+                    // อีเมล
+                    if (empty($save['email'])) {
+                        $ret['ret_register_email'] = 'Please fill in';
+                    } elseif (!Validator::email($save['email'])) {
+                        $ret['ret_register_email'] = Language::replace('Invalid :name', array(':name' => Language::get('Email')));
+                    } else {
+                        // ตรวจสอบอีเมลซ้ำ
+                        $search = $db->first($user_table, array('email', $save['email']));
+                        if ($search !== false) {
+                            $ret['ret_register_email'] = Language::replace('This :name already exist', array(':name' => Language::get('Email')));
+                        } else {
+                            list($displayname, $domain) = explode('@', $save['email']);
+                        }
+                    }
+                }
+                if (in_array('phone1', self::$cfg->login_fields)) {
+                    // ตรวจสอบ phone1
+                    if (!empty($save['phone1'])) {
+                        // ตรวจสอบ phone1 ซ้ำ
+                        $search = $this->db()->first($user_table, array('phone1', $save['phone1']));
+                        if ($search) {
+                            $ret['ret_register_phone1'] = Language::replace('This :name already exist', array(':name' => Language::get('Phone number')));
+                        } else {
+                            $displayname = $save['phone1'];
+                        }
+                    } elseif (in_array('phone1', self::$cfg->login_fields) && self::$cfg->member_phone == 2) {
+                        $ret['ret_register_phone1'] = 'Please fill in';
                     }
                 }
                 // password
@@ -78,7 +96,7 @@ class Model extends \Kotchasan\Model
                     $ret['ret_register_repassword'] = Language::get('Enter your password to match the two inputs');
                 } else {
                     $save['salt'] = uniqid();
-                    $save['password'] = sha1($password.$save['salt']);
+                    $save['password'] = sha1(self::$cfg->password_key.$password.$save['salt']);
                 }
                 // phone1
                 if (!empty($save['phone1'])) {
@@ -97,12 +115,12 @@ class Model extends \Kotchasan\Model
                 // idcard
                 if (!empty($save['idcard'])) {
                     if (!Validator::idCard($save['idcard'])) {
-                        $ret['ret_register_idcard'] = Language::replace('Invalid :name', array(':name' => Language::get('Identification number')));
+                        $ret['ret_register_idcard'] = Language::replace('Invalid :name', array(':name' => Language::get('Identification No.')));
                     } else {
                         // ตรวจสอบ idcard ซ้ำ
                         $search = $db->first($user_table, array('idcard', $save['idcard']));
                         if ($search !== false) {
-                            $ret['ret_register_idcard'] = Language::replace('This :name already exist', array(':name' => Language::get('Identification number')));
+                            $ret['ret_register_idcard'] = Language::replace('This :name already exist', array(':name' => Language::get('Identification No.')));
                         }
                     }
                 } elseif (self::$cfg->member_idcard == 2) {
@@ -112,9 +130,12 @@ class Model extends \Kotchasan\Model
                     $save['create_date'] = time();
                     $save['active'] = 0;
                     $save['status'] = self::$cfg->new_register_status;
-                    list($displayname, $domain) = explode('@', $save['email']);
                     $save['displayname'] = $displayname;
                     $save['name'] = ucwords($displayname);
+                    if (empty(self::$cfg->user_activate)) {
+                        // สำหรับการเข้าระบบอัตโนมัติ
+                        $save['token'] = md5(uniqid());
+                    }
                     $a = 1;
                     while (true) {
                         if (false === $db->first($user_table, array('displayname', $save['displayname']))) {
@@ -128,27 +149,31 @@ class Model extends \Kotchasan\Model
                     $save['activatecode'] = empty(self::$cfg->user_activate) ? '' : md5(uniqid());
                     // บันทึกลงฐานข้อมูล
                     $save['id'] = $db->insert($user_table, $save);
-                    // ส่งอีเมล
-                    $replace = array(
-                        '/%EMAIL%/' => $save['email'],
-                        '/%PASSWORD%/' => $password,
-                        '/%ID%/' => $save['activatecode'],
-                    );
-                    Email::send(empty(self::$cfg->user_activate) ? 2 : 1, 'member', $replace, $save['email']);
+                    if (!empty($save['email'])) {
+                        // ส่งอีเมล
+                        $replace = array(
+                            '/%EMAIL%/' => $save['email'],
+                            '/%PASSWORD%/' => $password,
+                            '/%ID%/' => $save['activatecode'],
+                        );
+                        Email::send(empty(self::$cfg->user_activate) ? 2 : 1, 'member', $replace, $save['email']);
+                    }
                     if (empty(self::$cfg->user_activate)) {
                         // login
                         unset($save['password']);
                         $_SESSION['login'] = $save;
                         // แสดงข้อความตอบรับการสมัครสมาชิก
-                        $ret['alert'] = Language::replace('Registration information sent to :email complete. We will take you to edit your profile', array(':email' => $save['email']));
-                        // ถ้าไม่มีการกำหนดหน้าถัดไปมา ไปแก้ไขข้อมูลส่วนตัว
-                        $ret['location'] = isset($next) ? $next : WEB_URL.'index.php?module=editprofile';
+                        $ret['alert'] = Language::get('Already registered and logged in');
                     } else {
                         // แสดงข้อความตอบรับการสมัครสมาชิก
-                        $ret['alert'] = Language::replace('Register successfully, We have sent complete registration information to :email', array(':email' => $save['email']));
-                        // ถ้าไม่มีการกำหนดหน้าถัดไปมา กลับไปหน้าหลักเว็บไซต์
-                        $ret['location'] = isset($next) ? $next : WEB_URL.'index.php';
+                        if (empty($save['email'])) {
+                            $ret['alert'] = Language::get('Already registered Please wait for review');
+                        } else {
+                            $ret['alert'] = Language::replace('Register successfully, We have sent complete registration information to :email', array(':email' => $save['email']));
+                        }
                     }
+                    // ถ้าไม่มีการกำหนดหน้าถัดไปมา กลับไปหน้าหลักเว็บไซต์
+                    $ret['location'] = isset($next) ? $next : WEB_URL.'index.php';
                     // เคลียร์
                     $request->removeToken();
                 }

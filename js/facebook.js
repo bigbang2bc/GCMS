@@ -25,10 +25,7 @@ function initFacebookButton(button) {
                   q.push("token=" + encodeURIComponent($E("token").value));
                 }
                 if ($E("login_action")) {
-                  q.push(
-                    "login_action=" +
-                    encodeURIComponent($E("login_action").value)
-                  );
+                  q.push("login_action=" + encodeURIComponent($E("login_action").value));
                 }
                 for (var prop in response) {
                   q.push(prop + "=" + encodeURIComponent(response[prop]));
@@ -53,8 +50,5 @@ function initFacebook(appId, lng) {
       version: "v3.0"
     });
   };
-  loadJavascript(
-    "facebook-jssdk",
-    "//connect.facebook.net/" + (lng == "th" ? "th_TH" : "en_US") + "/sdk.js"
-  );
+  loadJavascript("facebook-jssdk", "//connect.facebook.net/" + (lng == "th" ? "th_TH" : "en_US") + "/sdk.js");
 }

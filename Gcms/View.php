@@ -38,7 +38,7 @@ class View extends \Gcms\Baseview
      */
     public function addBreadcrumb($url, $menu, $tooltip = '', $class = '')
     {
-        $menu = htmlspecialchars_decode($menu);
+        $menu = strip_tags(htmlspecialchars_decode($menu));
         $tooltip = $tooltip == '' ? $menu : $tooltip;
         if ($url) {
             $this->breadcrumbs_jsonld[] = array('@id' => $url, 'name' => $menu);

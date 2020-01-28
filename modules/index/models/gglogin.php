@@ -66,12 +66,12 @@ class Model extends \Kotchasan\Model
                 $save['visited'] = 1;
                 $save['ip'] = $request->getClientIp();
                 $save['salt'] = uniqid();
-                $save['password'] = sha1($password.$save['salt']);
+                $save['password'] = sha1(self::$cfg->password_key.$password.$save['salt']);
                 $save['lastvisited'] = time();
                 $save['create_date'] = $save['lastvisited'];
                 $save['icon'] = $save['id'].'.jpg';
                 $save['country'] = 'TH';
-                $save['token'] = sha1($password.$save['salt']);
+                $save['token'] = sha1(self::$cfg->password_key.$password.$save['salt']);
                 $db->insert($user_table, $save);
             } elseif ($search['social'] == 2) {
                 // google เคยเยี่ยมชมแล้ว อัปเดตการเยี่ยมชม
@@ -80,7 +80,7 @@ class Model extends \Kotchasan\Model
                 $save['lastvisited'] = time();
                 $save['ip'] = $request->getClientIp();
                 $save['salt'] = uniqid();
-                $save['token'] = sha1($password.$save['salt']);
+                $save['token'] = sha1(self::$cfg->password_key.$password.$save['salt']);
                 // อัปเดต
                 $db->update($user_table, $search['id'], $save);
             } else {

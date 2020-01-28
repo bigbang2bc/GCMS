@@ -438,15 +438,13 @@ function initFirstRowNumberOnly(tr, row) {
   });
 }
 
-function initLanguageTable(id) {
-  forEach($G(id).elems("a"), function() {
-    if ($G(this).hasClass("icon-copy")) {
-      callClick(this, function() {
-        copyToClipboard(this.title);
-        document.body.msgBox(trans("successfully copied to clipboard"));
-        return false;
-      });
-    }
+function initCopyToClipboard(id) {
+  forEach($E(id).querySelectorAll('.icon-copy'),function(){
+    callClick(this, function() {
+      copyToClipboard(this.title);
+      document.body.msgBox(trans("successfully copied to clipboard"));
+      return false;
+    });
   });
 }
 

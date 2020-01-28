@@ -10,6 +10,7 @@
 
 namespace Index\Welcome;
 
+use Gcms\Gcms;
 use Gcms\Login;
 use Kotchasan\Http\Request;
 use Kotchasan\Language;
@@ -38,10 +39,11 @@ class View extends \Kotchasan\View
         $template->add(array(
             '/<FACEBOOK>(.*)<\/FACEBOOK>/s' => empty(self::$cfg->facebook_appId) || !self::$cfg->demo_mode ? '' : '\\1',
             '/{TOKEN}/' => $request->createToken(),
-            '/{PLACEHOLDER}/' => \Gcms\Gcms::getLoginPlaceholder(),
+            '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
+            '/{ICON}/' => Gcms::usernameIcon(),
             '/{EMAIL}/' => Login::$login_params['username'],
             '/{PASSWORD}/' => isset(Login::$login_params['password']) ? Login::$login_params['password'] : '',
-            '/{MESSAGE}/' => Login::$login_message,
+            '/{MESSAGE}/' => Language::get(Login::$login_message),
             '/{CLASS}/' => empty(Login::$login_message) ? 'hidden' : (empty(Login::$login_input) ? 'message' : 'error'),
             '/{LOGIN_ACTION}/' => $request->getUri()->withoutParams('action'),
         ));
@@ -65,6 +67,8 @@ class View extends \Kotchasan\View
         $template = Template::create('', '', 'forgot');
         $template->add(array(
             '/{TOKEN}/' => $request->createToken(),
+            '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
+            '/{ICON}/' => Gcms::usernameIcon(),
             '/{EMAIL}/' => Login::$login_params['username'],
             '/{MESSAGE}/' => Login::$login_message,
             '/{CLASS}/' => empty(Login::$login_message) ? 'hidden' : (empty(Login::$login_input) ? 'message' : 'error'),

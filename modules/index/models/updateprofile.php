@@ -16,7 +16,7 @@ use Kotchasan\Http\Request;
 use Kotchasan\Language;
 
 /**
- * บันทึกข้อมูลสมาชิก
+ * module=editprofile
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -25,7 +25,7 @@ use Kotchasan\Language;
 class Model extends \Kotchasan\Model
 {
     /**
-     * แก้ไขข้อมูลสมาชิก (editprofile.php).
+     * แก้ไขข้อมูลสมาชิก (editprofile.php)
      *
      * @param Request $request
      */
@@ -48,16 +48,16 @@ class Model extends \Kotchasan\Model
                             $save[$k] = $request->post($key)->number();
                             break;
                         case 'sex':
-                            $save['sex'] = $request->post('register_sex')->topic();
-                            break;
                         case 'displayname':
                         case 'name':
+                        case 'company':
                         case 'address1':
                         case 'address2':
                         case 'province':
                         case 'country':
                             $save[$k] = $request->post($key)->topic();
                             break;
+                        case 'email':
                         case 'website':
                             $save[$k] = $request->post($key)->url();
                             break;
@@ -84,6 +84,30 @@ class Model extends \Kotchasan\Model
                     // ไม่พบสมาชิกที่แก้ไข
                     $ret['alert'] = Language::get('not a registered user');
                 } else {
+                    // อีเมล
+                    if (in_array('email', self::$cfg->login_fields) || $user->social > 0) {
+                        unset($save['email']);
+                    } elseif (!empty($save['email'])) {
+                        // ตรวจสอบอีเมลซ้ำ
+                        $search = $db->first($user_table, array('email', $save['email']));
+                        if ($search !== false && $user->id != $search->id) {
+                            $ret['ret_register_email'] = Language::replace('This :name already exist', array(':name' => Language::get('Email')));
+                        }
+                    }
+                    // โทรศัพท์
+                    if (in_array('phone1', self::$cfg->login_fields)) {
+                        unset($save['phone1']);
+                    } elseif (!empty($save['phone1'])) {
+                        if (!preg_match('/[0-9]{9,10}/', $save['phone1'])) {
+                            $ret['ret_register_phone1'] = Language::replace('Invalid :name', array(':name' => Language::get('Phone number')));
+                        } else {
+                            // ตรวจสอบโทรศัพท์ซ้ำ
+                            $search = $db->first($user_table, array('phone1', $save['phone1']));
+                            if ($search !== false && $user->id != $search->id) {
+                                $ret['ret_register_phone1'] = Language::replace('This :name already exist', array(':name' => Language::get('Phone number')));
+                            }
+                        }
+                    }
                     // ชื่อเล่น
                     if (isset($save['displayname'])) {
                         if (mb_strlen($save['displayname']) < 2) {
@@ -104,15 +128,15 @@ class Model extends \Kotchasan\Model
                             $ret['ret_register_name'] = 'Please fill in';
                         }
                     }
-                    // โทรศัพท์
-                    if (!empty($save['phone1'])) {
-                        if (!preg_match('/[0-9]{9,10}/', $save['phone1'])) {
-                            $ret['ret_register_phone1'] = Language::replace('Invalid :name', array(':name' => Language::get('Phone number')));
+                    // เลขประจำตัวประชาชน 13 หลัก
+                    if (!empty($save['idcard'])) {
+                        if (!preg_match('/[0-9]{13,13}/', $save['idcard'])) {
+                            $ret['ret_register_idcard'] = Language::replace('Invalid :name', array(':name' => Language::get('Identification No.')));
                         } else {
                             // ตรวจสอบโทรศัพท์ซ้ำ
-                            $search = $db->first($user_table, array('phone1', $save['phone1']));
+                            $search = $db->first($user_table, array('idcard', $save['idcard']));
                             if ($search !== false && $user->id != $search->id) {
-                                $ret['ret_register_phone1'] = Language::replace('This :name already exist', array(':name' => Language::get('Phone number')));
+                                $ret['ret_register_idcard'] = Language::replace('This :name already exist', array(':name' => Language::get('Identification No.')));
                             }
                         }
                     }
@@ -127,7 +151,7 @@ class Model extends \Kotchasan\Model
                         } else {
                             // password ใหม่ถูกต้อง
                             $save['salt'] = uniqid();
-                            $save['password'] = sha1($password.$save['salt']);
+                            $save['password'] = sha1(self::$cfg->password_key.$password.$save['salt']);
                         }
                     }
                     if (empty($ret)) {
@@ -168,14 +192,12 @@ class Model extends \Kotchasan\Model
                         $request->removeToken();
                     }
                 }
-            } else {
-                // โหมดตัวอย่าง
-                $ret['alert'] = Language::get('Unable to complete the transaction');
             }
         }
-        // คืนค่าเป็น JSON
-        if (!empty($ret)) {
-            echo json_encode($ret);
+        if (empty($ret)) {
+            $ret['alert'] = Language::get('Unable to complete the transaction');
         }
+        // คืนค่าเป็น JSON
+        echo json_encode($ret);
     }
 }

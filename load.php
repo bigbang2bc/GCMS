@@ -39,6 +39,11 @@ define('DB_LOG', false);
  * ภาษาอัตโนมัติจากบราวเซอร์
  */
 define('AUTO_LANGUAGE', false);
+/*
+ * ระบุ SQL Mode ที่ต้องการ
+ * หากพบปัญหาการใช้งาน
+ */
+//define('SQL_MODE', '');
 /**
  * load Kotchasan.
  */

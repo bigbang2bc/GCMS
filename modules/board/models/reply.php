@@ -55,6 +55,8 @@ class Model extends \Kotchasan\Model
                     $guest = in_array(-1, $index->can_reply);
                     // ผู้ดูแล
                     $moderator = Gcms::canConfig($login, $index, 'moderator');
+                    // คอลัมน์ที่เป็น username
+                    $field = self::$cfg->login_fields[0];
                     // รายการไฟล์อัปโหลด
                     $fileUpload = array();
                     if (empty($index->img_upload_type)) {
@@ -85,24 +87,24 @@ class Model extends \Kotchasan\Model
                         if ($login) {
                             // login ใช้ข้อมูลของคน login
                             $post['member_id'] = $login['id'];
-                            $post['email'] = $login['email'];
-                            $post['sender'] = empty($login['displayname']) ? $login['email'] : $login['displayname'];
+                            $post['email'] = $login[$field];
+                            $post['sender'] = empty($login['displayname']) ? $login[$field] : $login['displayname'];
                         } else {
                             // ตรวจสอบการ login
-                            $email = $request->post('reply_email')->url();
+                            $username = $request->post('reply_email')->url();
                             $password = $request->post('reply_password')->password();
-                            if ($email == '') {
-                                // ไม่ได้กรอกอีเมล
+                            if ($username == '') {
+                                // ไม่ได้กรอก username
                                 $ret['ret_reply_email'] = 'Please fill in';
                             }
                             if ($password == '' && !$guest) {
                                 // สมาชิกเท่านั้น และ ไม่ได้กรอกรหัสผ่าน
                                 $ret['ret_reply_password'] = 'Please fill in';
                             }
-                            if ($email != '' && $password != '') {
+                            if ($username != '' && $password != '') {
                                 // ตรวจสอบ user และ password
                                 $user = Login::checkMember(array(
-                                    'username' => $email,
+                                    'username' => $username,
                                     'password' => $password,
                                 ));
                                 if (is_string($user)) {
@@ -119,26 +121,26 @@ class Model extends \Kotchasan\Model
                                 } else {
                                     // สมาชิก สามารถแสดงความคิดเห็นได้
                                     $post['member_id'] = $user['id'];
-                                    $post['email'] = $user['email'];
-                                    $post['sender'] = empty($user['displayname']) ? $user['email'] : $user['displayname'];
+                                    $post['email'] = $user[$field];
+                                    $post['sender'] = empty($user['displayname']) ? $user[$field] : $user['displayname'];
                                 }
                             } elseif ($guest) {
-                                // ตรวจสอบอีเมลซ้ำกับสมาชิก สำหรับบุคคลทั่วไป
+                                // ตรวจสอบ username ซ้ำกับสมาชิก สำหรับบุคคลทั่วไป
                                 $search = $this->db()->createQuery()
                                     ->from('user')
-                                    ->where(array('email', $email))
+                                    ->where(array($field, $username))
                                     ->first('id');
                                 if ($search) {
-                                    // พบอีเมล ต้องการ password
+                                    // พบ username ต้องการ password
                                     $ret['ret_reply_password'] = 'Please fill in';
-                                } elseif (!Validator::email($email)) {
-                                    // อีเมลไม่ถูกต้อง
+                                } elseif ($field === 'email' && !Validator::email($username)) {
+                                    // email ไม่ถูกต้อง
                                     $ret['ret_reply_email'] = Language::replace('Invalid :name', array(':name' => Language::get('Email')));
                                 } else {
                                     // guest
                                     $post['member_id'] = 0;
-                                    $post['email'] = $email;
-                                    $post['sender'] = $email;
+                                    $post['email'] = $username;
+                                    $post['sender'] = $username;
                                 }
                             } else {
                                 // สมาชิกเท่านั้น
@@ -179,7 +181,7 @@ class Model extends \Kotchasan\Model
                                 $ext = $file->getClientFileExt();
                                 $post[$k] = "$mktime.$ext";
                                 while (is_file(ROOT_PATH.DATA_FOLDER.'board/'.$post[$k])) {
-                                    ++$mmktime;
+                                    ++$mktime;
                                     $post[$k] = "$mktime.$ext";
                                 }
                                 try {

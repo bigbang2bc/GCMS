@@ -151,7 +151,7 @@ class Model extends \Kotchasan\Model
                     } elseif ($action === 'activate' || $action === 'sendpassword') {
                         // ขอรหัสผ่านใหม่ ส่งอีเมลยืนยันสมาชิก
                         $query = $this->db()->createQuery()
-                            ->select('id', 'email', 'activatecode')
+                            ->select('id', 'email', 'activatecode', 'phone1')
                             ->from('user')
                             ->where(array(
                                 array('id', $match[1]),
@@ -162,16 +162,16 @@ class Model extends \Kotchasan\Model
                         $msgs = array();
                         foreach ($query->execute() as $item) {
                             // รหัสผ่านใหม่
-                            $password = substr(uniqid(), 0, 6);
+                            $password = substr(uniqid(), -6);
+                            $salt = uniqid();
+                            $save = array(
+                                'salt' => $salt,
+                                'password' => sha1(self::$cfg->password_key.$password.$salt),
+                            );
                             // ข้อมูลอีเมล
                             $replace = array(
                                 '/%PASSWORD%/' => $password,
                                 '/%EMAIL%/' => $item['email'],
-                            );
-                            $salt = uniqid();
-                            $save = array(
-                                'salt' => $salt,
-                                'password' => sha1($password.$salt),
                             );
                             if ($action === 'activate' || !empty($item['activatecode'])) {
                                 // activate หรือ ยังไม่ได้ activate
@@ -183,20 +183,19 @@ class Model extends \Kotchasan\Model
                                 // send mail
                                 $err = \Gcms\Email::send(3, 'member', $replace, $item['email']);
                             }
-                            $msgs = array();
-                            if (!$err->error()) {
+                            if ($err->error()) {
+                                $msgs[] = $err->getErrorMessage();
+                            } else {
                                 // อัปเดตรหัสผ่านใหม่
                                 $this->db()->update($user_table, $item['id'], $save);
-                            } else {
-                                $msgs[] = $err->getErrorMessage();
                             }
-                            if (empty($msgs)) {
-                                // ส่งอีเมล สำเร็จ
-                                $ret['alert'] = Language::get('Your message was sent successfully');
-                            } else {
-                                // มีข้อผิดพลาด
-                                $ret['alert'] = implode("\n", $msgs);
-                            }
+                        }
+                        if (empty($msgs)) {
+                            // ส่งอีเมล สำเร็จ
+                            $ret['alert'] = Language::get('Your message was sent successfully');
+                        } else {
+                            // มีข้อผิดพลาด
+                            $ret['alert'] = implode("\n", $msgs);
                         }
                         // คืนค่า
                         $ret['location'] = 'reload';

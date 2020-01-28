@@ -30,8 +30,7 @@ class Model extends \Kotchasan\Model
      */
     public static function getOwners()
     {
-        $model = new static();
-        $query = $model->db()->createQuery()
+        $query = static::createQuery()
             ->select('owner')
             ->from('language')
             ->groupBy('owner')
@@ -53,7 +52,7 @@ class Model extends \Kotchasan\Model
      */
     public function allowTags($string)
     {
-        return preg_replace_callback('/(&lt;(\/?(a|em|b|strong|ul|ol|li|dd|dt|dl)).*?&gt;)/is', function ($matches) {
+        return preg_replace_callback('/(&lt;(\/?(a|em|b|strong|ul|ol|li|dd|dt|dl|small)).*?&gt;)/is', function ($matches) {
             return html_entity_decode($matches[1]);
         }, $string);
     }
@@ -66,7 +65,7 @@ class Model extends \Kotchasan\Model
     public function submit(Request $request)
     {
         $ret = array();
-        // session, token, member, can_config, ไม่ใช่สมาชิกตัวอย่าง
+        // session, token, เข้าระบบแอดมินได้, can_config และไม่ใช่สมาชิกตัวอย่าง
         if ($request->initSession() && $request->isSafe() && $login = Login::adminAccess()) {
             if (Login::checkPermission($login, 'can_config') && Login::notDemoMode($login)) {
                 // ค่าที่ส่งมา

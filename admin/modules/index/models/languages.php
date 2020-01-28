@@ -32,7 +32,7 @@ class Model extends \Kotchasan\KBase
     public function action(Request $request)
     {
         $ret = array();
-        // session, referer, member, can_config, ไม่ใช่สมาชิกตัวอย่าง
+        // session, referer, เข้าระบบแอดมินได้, can_config, ไม่ใช่สมาชิกตัวอย่าง
         if ($request->initSession() && $request->isReferer() && $login = Login::adminAccess()) {
             if (Login::checkPermission($login, 'can_config') && Login::notDemoMode($login)) {
                 // โหลด config

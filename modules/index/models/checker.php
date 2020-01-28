@@ -76,7 +76,7 @@ class Model extends \Kotchasan\Model
             $id = self::$request->post('id')->toInt();
             $value = self::$request->post('value')->toString();
             if (!preg_match('/[0-9]{13,13}/', $value)) {
-                echo Language::replace('Invalid :name', array(':name' => Language::get('Identification number')));
+                echo Language::replace('Invalid :name', array(':name' => Language::get('Identification No.')));
             } else {
                 // ตรวจสอบ idcard
                 $model = new static();

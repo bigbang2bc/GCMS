@@ -148,6 +148,8 @@ class View extends \Gcms\View
                     '/{LOCK}/' => $index->locked == 0 ? 'un' : '',
                     '/{PIN_TITLE}/' => '{LNG_click to} '.($index->pin == 1 ? '{LNG_Unpin}' : '{LNG_Pin}'),
                     '/{LOCK_TITLE}/' => '{LNG_click to} '.($index->locked == 1 ? '{LNG_Unlock}' : '{LNG_Lock}'),
+                    '/{ICON}/' => Gcms::usernameIcon(),
+                    '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
                 );
                 // /board/view.html
                 $detail = Template::create('board', $index->module, 'view')->add($replace);

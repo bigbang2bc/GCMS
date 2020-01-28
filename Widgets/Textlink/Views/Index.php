@@ -43,7 +43,7 @@ class Index extends \Gcms\View
         $replace[] = $banner['description'];
         $replace[] = WEB_URL.DATA_FOLDER.'image/'.$banner['logo'];
         $replace[] = empty($banner['url']) ? '' : ' href="'.$banner['url'].'"';
-        $replace[] = $banner['target'] == '_blank' ? ' target=_blank' : '';
+        $replace[] = $banner['target'] == '_blank' ? ' target="_blank"' : '';
 
         return '<div class="widget_textlink '.$banner['name'].'">'.preg_replace($patt, $replace, $styles['banner']).'</div>';
     }
@@ -81,11 +81,11 @@ class Index extends \Gcms\View
             if (empty($item['url'])) {
                 $a = '';
             } else {
-                $a = ' href="'.$item['url'].'"'.($item['target'] == '_blank' ? ' target=_blank' : '').' title="'.$item['text'].'"';
+                $a = ' href="'.$item['url'].'"'.($item['target'] == '_blank' ? ' target="_blank"' : '').' title="'.$item['text'].'"';
             }
-            $row .= '<a'.$a.'><img class=nozoom src="'.WEB_URL.DATA_FOLDER.'image/'.$item['logo'].'" alt="'.$item['text'].'"></a>';
+            $row .= '<a'.$a.'><img alt="'.$item['text'].'" class="nozoom" src="'.WEB_URL.DATA_FOLDER.'image/'.$item['logo'].'"></a>';
             if ($item['text'] != '') {
-                $row .= '<figcaption>'.$item['text'].'</figcaption>';
+                $row .= '<figcaption><a'.$a.'><span>'.$item['text'].'</span></a></figcaption>';
             }
             $row .= '</figure>';
             $textlinks[] = $row;
@@ -93,7 +93,7 @@ class Index extends \Gcms\View
         // แสดงผล
         $id = 'textlinks_slideshow_'.$item['name'];
 
-        return '<div id='.$id.'><div>'.implode("\n", $textlinks).'</div></div><script>new GBanner("'.$id.'").playSlideShow();</script>';
+        return '<div id="'.$id.'"><div>'.implode("\n", $textlinks).'</div></div><script>new GBanner("'.$id.'").playSlideShow();</script>';
     }
 
     /**
@@ -119,7 +119,7 @@ class Index extends \Gcms\View
                 $replace[] = $banner['description'];
                 $replace[] = WEB_URL.DATA_FOLDER.'image/'.$banner['logo'];
                 $replace[] = empty($banner['url']) ? '' : ' href="'.$banner['url'].'"';
-                $replace[] = $banner['target'] == '_blank' ? ' target=_blank' : '';
+                $replace[] = $banner['target'] == '_blank' ? ' target="_blank"' : '';
                 $textlinks[] = preg_replace($patt, $replace, $template);
             }
 

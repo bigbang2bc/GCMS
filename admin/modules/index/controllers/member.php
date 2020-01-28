@@ -53,6 +53,7 @@ class Controller extends \Gcms\Controller
             ));
             // แสดงตาราง
             $section->appendChild(createClass('Index\Member\View')->render($request));
+            // คืนค่า HTML
 
             return $section->render();
         }

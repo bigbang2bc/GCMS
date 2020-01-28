@@ -54,7 +54,7 @@ class View extends \Gcms\View
             if ($to != '') {
                 // ข้อมูลส่งกลับ
                 $index = (object) array(
-                    'topic' => Language::replace('Send a message to the :name', array(':name' => $to_msg)),
+                    'topic' => Language::get('Send a message to the').' '.$to_msg,
                     'keywords' => self::$cfg->web_title,
                     'description' => self::$cfg->web_description,
                     'module' => 'sendmail',

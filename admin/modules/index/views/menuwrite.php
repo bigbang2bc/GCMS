@@ -113,7 +113,7 @@ class View extends \Gcms\Adminview
             'itemClass' => 'item',
             'label' => '{LNG_Menu position}',
             'comment' => '{LNG_Select the menu position. The menu will be displayed on the website at the selected position. (Based on templates you are using)}',
-            'options' => Language::find('MENU_PARENTS', array('MAINMENU' => 'Main menu')),
+            'options' => Language::get('MENU_PARENTS'),
             'value' => $menu->parent,
         ));
         // type

@@ -14,7 +14,6 @@ use Gcms\Gcms;
 use Kotchasan\Http\Request;
 use Kotchasan\Language;
 use Kotchasan\Mime;
-use Kotchasan\Model;
 use Kotchasan\Template;
 
 /**
@@ -37,16 +36,18 @@ class View extends \Gcms\View
     public function render(Request $request, $index)
     {
         // อ่านข้อมูลสมาชิก
-        $model = new Model();
-        $user = $model->db()->createQuery()
-            ->from('user')
-            ->where(array('id', (int) $_SESSION['login']['id']))
+        $user = \Kotchasan\Model::createQuery()
+            ->from('user U')
+            ->where(array('U.id', (int) $_SESSION['login']['id']))
             ->first();
+        // member/profile.html
         $template = Template::create('member', 'member', 'profile');
         $contents = array(
             '/<NEWREGISTER>(.*)<\/NEWREGISTER>/isu' => $request->request('action')->toString() === 'newregister' ? '\\1' : '',
             '/<IDCARD>(.*)<\/IDCARD>/isu' => empty(self::$cfg->member_idcard) ? '' : '\\1',
             '/{ACCEPT}/' => Mime::getAccept(self::$cfg->user_icon_typies),
+            '/{EDITPHONE}/' => in_array('phone1', self::$cfg->login_fields) ? 'disabled' : '',
+            '/{EDITEMAIL}/' => in_array('email', self::$cfg->login_fields) || $user->social > 0 ? 'disabled' : '',
         );
         // ข้อมูลฟอร์ม
         foreach ($user as $key => $value) {

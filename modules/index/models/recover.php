@@ -31,22 +31,26 @@ class Model extends \Kotchasan\Model
         // referer, session
         if ($request->initSession() && $request->isReferer()) {
             $ret = array();
+            // ชื่อฟิลด์สำหรับตรวจสอบอีเมล ใช้ฟิลด์แรกจาก config
+            $field = reset(self::$cfg->login_fields);
+            // ตาราง user
+            $table = $this->getTableName('user');
+            // Database
+            $db = $this->db();
             // ค่าที่ส่งมา
-            $email = $request->post('forgot_email')->url();
-            if ($email === '') {
+            $username = $request->post('forgot_email')->url();
+            if ($username === '') {
                 $ret['ret_forgot_email'] = 'Please fill in';
             } else {
-                $search = $this->db()->createQuery()
-                    ->from('user')
-                    ->where(array(array('email', $email), array('social', 0)))
-                    ->first('id', 'email', 'salt');
+                // ค้นหา username
+                $search = $db->first($table, array(array($field, $username), array('social', 0)));
                 if ($search === false) {
                     $ret['ret_forgot_email'] = Language::get('not a registered user');
                 }
             }
             if (empty($ret)) {
                 // รหัสผ่านใหม่
-                $password = substr(uniqid(), 0, 6);
+                $password = substr(uniqid(), -6);
                 // ข้อมูลอีเมล
                 $replace = array(
                     '/%PASSWORD%/' => $password,
@@ -54,16 +58,20 @@ class Model extends \Kotchasan\Model
                 );
                 // send mail
                 $err = Email::send(3, 'member', $replace, $search->email);
-                if (!$err->error()) {
+                if ($err->error()) {
+                    $ret['ret_forgot_email'] = $err->getErrorMessage();
+                } else {
                     // อัปเดตรหัสผ่านใหม่
-                    $save = array('password' => sha1($password.$search->salt));
-                    $this->db()->createQuery()->update('user')->set($save)->where($search->id)->execute();
+                    $salt = uniqid();
+                    $save = array(
+                        'salt' => $salt,
+                        'password' => sha1(self::$cfg->password_key.$password.$salt),
+                    );
+                    $db->update($table, (int) $search->id, $save);
                     // คืนค่า
                     $ret['alert'] = Language::get('Your message was sent successfully');
                     $location = $request->post('modal')->url();
                     $ret['location'] = $location === 'true' ? 'close' : $location;
-                } else {
-                    $ret['ret_forgot_email'] = $err->getErrorMessage();
                 }
             }
             // คืนค่าเป็น JSON

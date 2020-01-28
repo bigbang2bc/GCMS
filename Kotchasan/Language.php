@@ -44,6 +44,7 @@ final class Language extends \Kotchasan\KBase
      * ถ้าระบุ $value_key มาด้วยและ ค่าของภาษาเป็นแอเรย์ จะคืนค่า แอเรย์ของภาษาที่ $value_key
      * ถ้าไม่พบข้อมูลที่เลือกคืนค่า null.
      *
+     * @assert ('XYZ', array()) [==] array()
      * @assert ('YEAR_OFFSET') [==] 543
      * @assert ('DATE_LONG', null, 0) [==] 'อาทิตย์'
      * @assert ('not found', 'default') [==] 'default'
@@ -57,12 +58,18 @@ final class Language extends \Kotchasan\KBase
         if (null === self::$languages) {
             new static();
         }
-        $result = isset(self::$languages->$key) ? self::$languages->$key : ($default === null ? $key : $default);
-        if ($value_key !== null && is_array($result)) {
-            $result = isset($result[$value_key]) ? $result[$value_key] : null;
+        if (isset(self::$languages->{$key})) {
+            $item = self::$languages->{$key};
+            if (is_array($item)) {
+                if ($value_key !== null && isset($item[$value_key])) {
+                    return $item[$value_key];
+                }
+            } else {
+                return $item;
+            }
         }
 
-        return $result;
+        return $default === null ? $key : $default;
     }
 
     /**
@@ -85,7 +92,7 @@ final class Language extends \Kotchasan\KBase
             new static();
         }
 
-        return isset(self::$languages->$key) ? self::$languages->$key : ($default === null ? $key : $default);
+        return isset(self::$languages->{$key}) ? self::$languages->{$key} : ($default === null ? $key : $default);
     }
 
     /**
@@ -102,7 +109,7 @@ final class Language extends \Kotchasan\KBase
         }
         $result = array();
         foreach ($keys as $i => $key) {
-            $result[is_int($i) ? $key : $i] = isset(self::$languages->$key) ? self::$languages->$key : $key;
+            $result[is_int($i) ? $key : $i] = isset(self::$languages->{$key}) ? self::$languages->{$key} : $key;
         }
 
         return $result;

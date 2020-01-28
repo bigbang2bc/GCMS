@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource modules/index/models/upgrade1331.php
+ * @filesource modules/index/models/upgrade1340.php
  *
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -8,7 +8,7 @@
  * @see http://www.kotchasan.com/
  */
 
-namespace Index\Upgrade1331;
+namespace Index\Upgrade1340;
 
 /**
  * อัปเกรด.
@@ -20,7 +20,7 @@ namespace Index\Upgrade1331;
 class Model extends \Index\Upgrade\Model
 {
     /**
-     * อัปเกรดเป็นเวอร์ชั่น 13.3.1.
+     * อัปเกรดเป็นเวอร์ชั่น 13.4.0
      *
      * @return string
      */
@@ -52,11 +52,11 @@ class Model extends \Index\Upgrade\Model
             $db->query("ALTER TABLE `$table` ADD `page` VARCHAR(20) NOT NULL DEFAULT ''");
             $content[] = '<li class="correct">Updated database <b>'.$table.'</b> complete...</li>';
         }
-        $content[] = '<li class="correct">Upgrade to Version <b>13.3.1</b> complete.</li>';
+        $content[] = '<li class="correct">Upgrade to Version <b>13.4.0</b> complete.</li>';
 
         return (object) array(
             'content' => implode('', $content),
-            'version' => '13.3.1',
+            'version' => '13.4.0',
         );
     }
 }

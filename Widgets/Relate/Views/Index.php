@@ -13,6 +13,7 @@ namespace Widgets\Relate\Views;
 use Document\Index\Controller;
 use Kotchasan\Date;
 use Kotchasan\Grid;
+use Kotchasan\Language;
 
 /**
  * Controller หลัก สำหรับแสดงผล Widget.
@@ -60,7 +61,11 @@ class Index extends \Gcms\View
                 ));
             }
 
-            return createClass('Gcms\View')->renderHTML($listitem->render());
+            if ($listitem->hasItem()) {
+                return createClass('Gcms\View')->renderHTML($listitem->render());
+            } else {
+                return Language::trans('<div class="error center">{LNG_Sorry, no information available for this item.}</div>');
+            }
         }
     }
 }

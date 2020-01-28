@@ -57,6 +57,9 @@ class PdoMysqlDriver extends Driver
         if (isset($this->settings->username) && isset($this->settings->password)) {
             try {
                 $this->connection = new \PDO($sql, $this->settings->username, $this->settings->password, $this->options);
+                if (defined('SQL_MODE')) {
+                    $this->connection->query("SET SESSION sql_mode='".SQL_MODE."'");
+                }
             } catch (\PDOException $e) {
                 throw new \Exception($e->getMessage(), 500, $e);
             }
@@ -187,21 +190,22 @@ class PdoMysqlDriver extends Driver
             if (isset($sqls['orupdate'])) {
                 $sql .= ' ON DUPLICATE KEY UPDATE '.implode(', ', $sqls['orupdate']);
             }
-        } elseif (isset($sqls['union'])) {
-            $sql .= '('.implode(') UNION (', $sqls['union']).')';
-        } elseif (isset($sqls['unionAll'])) {
-            $sql .= '('.implode(') UNION ALL (', $sqls['unionAll']).')';
         } else {
-            if (isset($sqls['select'])) {
-                $sql .= 'SELECT '.$sqls['select'];
-                if (isset($sqls['from'])) {
-                    $sql .= ' FROM '.$sqls['from'];
+            if (isset($sqls['union'])) {
+                $sql .= '('.implode(') UNION (', $sqls['union']).')';
+            } elseif (isset($sqls['unionAll'])) {
+                $sql .= '('.implode(') UNION ALL (', $sqls['unionAll']).')';
+            } else {
+                if (isset($sqls['select'])) {
+                    $sql .= 'SELECT '.$sqls['select'];
+                    if (isset($sqls['from'])) {
+                        $sql .= ' FROM '.$sqls['from'];
+                    }
+                } elseif (isset($sqls['update'])) {
+                    $sql .= 'UPDATE '.$sqls['update'];
+                } elseif (isset($sqls['delete'])) {
+                    $sql .= 'DELETE FROM '.$sqls['delete'];
                 }
-            }
-            if (isset($sqls['update'])) {
-                $sql .= 'UPDATE '.$sqls['update'];
-            } elseif (isset($sqls['delete'])) {
-                $sql .= 'DELETE FROM '.$sqls['delete'];
             }
             if (isset($sqls['join'])) {
                 foreach ($sqls['join'] as $join) {

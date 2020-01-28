@@ -36,21 +36,41 @@ class Model extends \Kotchasan\Model
             if (Login::notDemoMode($login)) {
                 // รับค่าจากการ POST
                 $save = array(
-                    'email' => $request->post('register_email')->url(),
                     'status' => $request->post('register_status')->toInt(),
                 );
+                if (in_array('email', self::$cfg->login_fields)) {
+                    $save['email'] = $request->post('register_email')->url();
+                }
+                if (in_array('phone1', self::$cfg->login_fields)) {
+                    $save['phone1'] = $request->post('register_phone1')->number();
+                }
                 $permission = $request->post('register_permission', array())->topic();
                 // ตาราง user
                 $user_table = $this->getTableName('user');
                 // ตรวจสอบ email
-                if (empty($save['email'])) {
-                    $ret['ret_register_email'] = 'Please fill in';
-                } else {
+                if (!empty($save['email'])) {
                     // ตรวจสอบ email ซ้ำ
                     $search = $this->db()->first($user_table, array('email', $save['email']));
                     if ($search) {
                         $ret['ret_register_email'] = Language::replace('This :name already exist', array(':name' => Language::get('Email')));
+                    } else {
+                        // ใช้ชื่อจาก email
+                        list($displayname, $domain) = explode('@', $save['email']);
                     }
+                } elseif (in_array('email', self::$cfg->login_fields)) {
+                    $ret['ret_register_email'] = 'Please fill in';
+                }
+                // ตรวจสอบ phone1
+                if (!empty($save['phone1'])) {
+                    // ตรวจสอบ phone1 ซ้ำ
+                    $search = $this->db()->first($user_table, array('phone1', $save['phone1']));
+                    if ($search) {
+                        $ret['ret_register_phone1'] = Language::replace('This :name already exist', array(':name' => Language::get('Phone number')));
+                    } else {
+                        $displayname = $save['phone1'];
+                    }
+                } elseif (in_array('phone1', self::$cfg->login_fields) && self::$cfg->member_phone == 2) {
+                    $ret['ret_register_phone1'] = 'Please fill in';
                 }
                 // password
                 $password = $request->post('register_password')->password();
@@ -65,12 +85,6 @@ class Model extends \Kotchasan\Model
                     $save['password'] = $password;
                 }
                 if (empty($ret)) {
-                    // ใช้ชื่อจาก email
-                    if (preg_match('/^(.*)(\@(.*))?$/', $save['email'], $match)) {
-                        $displayname = $match[1];
-                    } else {
-                        $displayname = $save['email'];
-                    }
                     $save['name'] = ucwords($displayname);
                     $save['displayname'] = $displayname;
                     $a = 1;
@@ -121,13 +135,13 @@ class Model extends \Kotchasan\Model
             $save['password'] = '';
         } else {
             $save['salt'] = uniqid();
-            $save['password'] = sha1($save['password'].$save['salt']);
+            $save['password'] = sha1(self::$cfg->password_key.$save['password'].$save['salt']);
         }
         if (!isset($save['country'])) {
             $save['country'] = 'TH';
         }
         $save['permission'] = empty($permission) ? '' : ','.implode(',', $permission).',';
-        $save['active'] = 1;
+        $save['active'] = 0;
         $save['ban'] = 0;
         $save['create_date'] = time();
         // บันทึกลงฐานข้อมูล

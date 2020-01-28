@@ -12,6 +12,7 @@ namespace Index\Language;
 
 use Kotchasan\DataTable;
 use Kotchasan\Http\Request;
+use Kotchasan\Language;
 use Kotchasan\Text;
 
 /**
@@ -77,6 +78,12 @@ class View extends \Gcms\Adminview
                     'href' => $uri->createBackUri(array('module' => 'languageedit', 'id' => null, 'js' => $js)),
                     'text' => '{LNG_Add New}',
                 ),
+                'import' => array(
+                    'class' => 'button pink icon-import',
+                    'id' => 'import_0',
+                    'text' => '{LNG_Import} {LNG_Language}',
+                    'data-confirm' => Language::trans('{LNG_You want to} {LNG_Import} {LNG_Language}?'),
+                ),
             ),
             /* ตัวเลือกด้านบนของตาราง ใช้จำกัดผลลัพท์การ query */
             'filters' => array(
@@ -125,7 +132,7 @@ class View extends \Gcms\Adminview
         setcookie('language_perPage', $table->perPage, time() + 2592000, '/', HOST, HTTPS, true);
         setcookie('language_sort', $table->sort, time() + 2592000, '/', HOST, HTTPS, true);
         // Javascript
-        $table->script('initLanguageTable("language_table");');
+        $table->script('initCopyToClipboard("language_table");');
         // คืนค่า HTML
 
         return $table->render();

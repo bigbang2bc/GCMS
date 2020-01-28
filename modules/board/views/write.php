@@ -58,6 +58,8 @@ class View extends \Gcms\View
             '/{MODULEID}/' => $index->module_id,
             '/{TOKEN}/' => $request->createToken(),
             '/{LOGIN_EMAIL}/' => $login['email'],
+            '/{ICON}/' => Gcms::usernameIcon(),
+            '/{PLACEHOLDER}/' => Gcms::getLoginPlaceholder(),
         ));
         Gcms::$view->setContentsAfter(array(
             '/:size/' => $index->img_upload_size,

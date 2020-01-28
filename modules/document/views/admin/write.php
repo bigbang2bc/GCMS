@@ -111,7 +111,7 @@ class View extends \Gcms\Adminview
             'labelClass' => 'g-input icon-world',
             'itemClass' => 'item',
             'label' => '{LNG_Alias}',
-            'comment' => '{LNG_Used for the URL of the web page (SEO) can use letters, numbers and _ only can not have duplicate names.}',
+            'comment' => '{LNG_Used for the URL of the web page (SEO) can use letters, numbers and - only can not have duplicate names.}',
             'value' => $index->alias,
         ));
         // create_date

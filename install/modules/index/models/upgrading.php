@@ -25,7 +25,6 @@ class Model extends \Kotchasan\Model
      */
     public static function upgrade($db, $version)
     {
-        $db->query('SET SQL_MODE=""');
         if ($version == '9.1.0' || $version == '10.1.2') {
             // อัปเกรดจาก 9.1.0 (เวอร์ชั่นที่ไม่ได้ใช้ Kotchasan)
             return \Index\Upgrade910\Model::upgrade($db);
@@ -38,9 +37,9 @@ class Model extends \Kotchasan\Model
         } elseif ($version < '13.0.0') {
             // อัปเกรดเป็น 13.0.0
             return \Index\Upgrade1300\Model::upgrade($db);
-        } elseif ($version < '13.3.1') {
-            // อัปเกรดเป็น 13.3.1
-            return \Index\Upgrade1331\Model::upgrade($db);
+        } elseif ($version < '13.4.0') {
+            // อัปเกรดเป็น 13.4.0
+            return \Index\Upgrade1340\Model::upgrade($db);
         }
     }
 }

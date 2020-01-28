@@ -42,15 +42,16 @@ class View extends \Gcms\View
         // /member/registerfrm.html
         $template = Template::create('member', 'member', 'registerfrm');
         $template->add(array(
-            '/<PHONE>(.*)<\/PHONE>/isu' => empty(self::$cfg->member_phone) ? '' : '\\1',
+            '/<EMAIL>(.*)<\/EMAIL>/isu' => in_array('email', self::$cfg->login_fields) ? '\\1' : '',
+            '/<PHONE>(.*)<\/PHONE>/isu' => in_array('phone1', self::$cfg->login_fields) || !empty(self::$cfg->member_phone) ? '\\1' : '',
             '/<IDCARD>(.*)<\/IDCARD>/isu' => empty(self::$cfg->member_idcard) ? '' : '\\1',
-            '/{LNG_([^}]+)}/e' => '\Kotchasan\Language::parse(array(1=>"$1"))',
             '/{TOPIC}/' => $index->topic,
             '/{TOKEN}/' => $request->createToken(),
+            '/{WEBTITLE}/' => self::$cfg->web_title,
             '/{WEBURL}/' => WEB_URL,
             '/{NEXT}/' => $modal ? 'close' : WEB_URL.'index.php',
         ));
-        $index->detail = $template->render();
+        $index->detail = Language::trans($template->render());
         $index->keywords = $index->topic;
         if (isset(Gcms::$view)) {
             Gcms::$view->addBreadcrumb($index->canonical, Language::get('Register'));

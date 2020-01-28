@@ -18,7 +18,7 @@ use Kotchasan\Http\Request;
 use Kotchasan\Language;
 
 /**
- * บันทึกการตั้งค่าเว็บไซต์.
+ * module=system
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -46,14 +46,14 @@ class Model extends \Kotchasan\KBase
     }
 
     /**
-     * บันทึกการตั้งค่าเว็บไซต์ (system.php).
+     * บันทึกการตั้งค่าเว็บไซต์ (system.php)
      *
      * @param Request $request
      */
     public function submit(Request $request)
     {
         $ret = array();
-        // session, token, member, can_config, ไม่ใช่สมาชิกตัวอย่าง
+        // session, token, เข้าระบบแอดมินได้, can_config และไม่ใช่สมาชิกตัวอย่าง
         if ($request->initSession() && $request->isSafe() && $login = Login::adminAccess()) {
             if (Login::checkPermission($login, 'can_config') && Login::notDemoMode($login)) {
                 // โหลด config

@@ -1,6 +1,3 @@
-html {
-  scroll-behavior: smooth;
-}
 body,
 li {
   line-height: 1.8;
@@ -419,10 +416,12 @@ header.list h2 select {
   position: relative;
   height: 100%;
 }
+.vscroller:hover .btnnav,
 .gbanner:hover .btnnav {
   color: #fff;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.4);
 }
+.vscroller .btnnav,
 .gbanner .btnnav {
   font-size: 1.3em;
 }
@@ -435,10 +434,26 @@ header.list h2 select {
   width: 100%;
   text-align: center;
 }
-.gbanner .button_container {
+.gslideshow .button_wrapper_thumbnail {
+  overflow: hidden;
+  position: relative;
+  margin-top: 5px;
+}
+.gbanner .button_wrapper .button_container {
   margin: 0;
 }
-.gbanner .button_container>a {
+.gbanner .button_wrapper_thumbnail .button_container {
+  display: table;
+  margin: 0 auto;
+}
+.gslideshow .button_wrapper_thumbnail .button_container.scroll {
+  -webkit-transition: left 0.5s ease-in-out;
+  -moz-transition: left 0.5s ease-in-out;
+  -ms-transition: left 0.5s ease-in-out;
+  -o-transition: left 0.5s ease-in-out;
+  transition: left 0.5s ease-in-out;
+}
+.gbanner .button_wrapper .button_container>a {
   position: relative;
   display: inline-block;
   background-color: rgba(255, 0, 0, 0.3);
@@ -452,6 +467,67 @@ header.list h2 select {
   -moz-border-radius: 50em;
   -webkit-border-radius: 50em;
   border-radius: 50em;
+}
+.gbanner .button_wrapper_thumbnail .button_container>a {
+  display: table-cell;
+}
+.gbanner .button_wrapper a {
+  color: #fff;
+  display: block;
+}
+.gbanner .button_wrapper a.current {
+  background-color: rgba(255, 0, 0, 0.8);
+}
+.gbanner .button_wrapper .button_container>a>span {
+  display: none;
+  width: 50px;
+  height: 37.5px;
+  position: absolute;
+  left: 50%;
+  margin-top: -47.5px;
+  margin-left: -25px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+.gbanner .button_wrapper_thumbnail .button_container>a>span,
+.gbanner .button_wrapper .button_container>a>span {
+  background-size: cover;
+  background-position: center;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+.gbanner .button_wrapper_thumbnail .button_container>a>span {
+  display: block;
+  width: 100px;
+  height: 75px;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+  margin: 3px 5px;
+}
+.gbanner .button_wrapper_thumbnail a.current>span {
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3);
+}
+.gbanner .button_wrapper .button_container span:after {
+  content: "";
+  position: absolute;
+  border-width: 6px;
+  border-color: rgba(0, 0, 0, 0.5);
+  border-style: solid solid none solid;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -7px;
+  margin-left: -6px;
+  left: 50%;
+}
+.gbanner .button_wrapper .button_container>a:hover>span {
+  display: block;
+  -webkit-animation: fadein 1s ease both;
+  -moz-animation: fadein 1s ease both;
+  -ms-animation: fadein 1s ease both;
+  animation: fadein 1s ease both;
 }
 .gbanner figure {
   position: relative;
@@ -472,6 +548,9 @@ header.list h2 select {
   transition: opacity 2s ease-in-out;
   background-position: center;
   background-size: contain;
+}
+.gbanner figure>a {
+  display: block;
 }
 .gbanner figure.show {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
@@ -497,43 +576,6 @@ header.list h2 select {
 }
 .gbanner:hover figcaption {
   bottom: 0;
-}
-.gbanner a {
-  color: #fff;
-  display: block;
-}
-.gbanner a.current {
-  background-color: rgba(255, 0, 0, 0.8);
-}
-.gbanner .button_container>a>span {
-  display: none;
-  width: 50px;
-  height: 50px;
-  background-size: cover;
-  position: absolute;
-  left: 50%;
-  margin-top: -60px;
-  margin-left: -25px;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-}
-.gbanner .button_container span:after {
-  content: "";
-  position: absolute;
-  border-width: 6px;
-  border-color: rgba(0, 0, 0, 0.5);
-  border-style: solid solid none solid;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  bottom: -7px;
-  margin-left: -6px;
-  left: 50%;
-}
-.gbanner .button_container>a:hover>span {
-  display: block;
-  -webkit-animation: fadein 1s ease both;
-  -moz-animation: fadein 1s ease both;
-  -ms-animation: fadein 1s ease both;
-  animation: fadein 1s ease both;
 }
 
 /* search form */
@@ -625,7 +667,8 @@ header.list h2 select {
 .search-item>p.link {
   color: #008000;
 }
-.search-item h6 a {
+.search-item h6 a,
+.search-item h3 a {
   color: inherit;
   font-family: arial, sans-serif;
   font-size: 1.4em;

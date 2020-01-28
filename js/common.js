@@ -51,6 +51,8 @@ function showModal(src, qstr, doClose, className) {
         alert(ds.alert);
       } else if (ds.detail) {
         detail = decodeURIComponent(ds.detail);
+      } else if (ds.modal) {
+        detail = ds.modal;
       }
     } else {
       detail = xhr.responseText;
@@ -133,7 +135,7 @@ function defaultSubmit(ds) {
       if (val == "") {
         el.valid();
       } else {
-        if (val == "Please fill in" || val == "Please select" || val == "Please browse file" || val == "already exist" || val == "Please select at least one item" || val=="Invalid data") {
+        if (val == "Please fill in" || val == "Please select" || val == "Please browse file" || val == "already exist" || val == "Please select at least one item" || val == "Invalid data") {
           var label = el.findLabel();
           if (label) {
             t = label.innerHTML.strip_tags();
@@ -488,6 +490,10 @@ function loadJavascript(id, src) {
   js.src = src;
   fjs.parentNode.insertBefore(js, fjs);
 }
+var doLogin = function() {
+  showModal(WEB_URL + "xhr.php", 'class=Index\\Member\\Controller&method=modal&action=' + this.get('data-action'), null, 'loginfrm');
+  return false;
+};
 var doLoginSubmit = function(xhr) {
   var el,
     t,

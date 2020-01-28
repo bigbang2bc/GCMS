@@ -48,18 +48,33 @@ class View extends \Gcms\View
             'title' => '{LNG_Login information}',
         ));
         $groups = $fieldset->add('groups');
-        // email (แอดมิน และตัวเอง สามารถแก้ไขได้)
-        $groups->add('text', array(
-            'id' => 'register_email',
-            'itemClass' => 'width50',
-            'labelClass' => 'g-input icon-email',
-            'label' => '{LNG_Email}',
-            'comment' => '{LNG_The system will send the registration information to this e-mail. Please use real email address}',
-            'disabled' => $login_admin ? false : true,
-            'maxlength' => 255,
-            'value' => $user['email'],
-            'validator' => array('keyup,change', 'checkEmail', 'index.php/index/model/checker/email'),
-        ));
+        if (in_array('email', self::$cfg->login_fields)) {
+            // email (แอดมิน และตัวเอง สามารถแก้ไขได้)
+            $groups->add('text', array(
+                'id' => 'register_email',
+                'itemClass' => 'width50',
+                'labelClass' => 'g-input icon-email',
+                'label' => '{LNG_Email}',
+                'comment' => '{LNG_The system will send the registration information to this e-mail. Please use real email address}',
+                'disabled' => $login_admin ? false : true,
+                'maxlength' => 255,
+                'value' => $user['email'],
+                'validator' => array('keyup,change', 'checkEmail', 'index.php/index/model/checker/email'),
+            ));
+        }
+        if (in_array('phone1', self::$cfg->login_fields)) {
+            // phone1 (แอดมิน และตัวเอง สามารถแก้ไขได้)
+            $groups->add('tel', array(
+                'id' => 'register_phone1',
+                'itemClass' => 'width50',
+                'labelClass' => 'g-input icon-phone',
+                'label' => '{LNG_Phone}',
+                'disabled' => $login_admin ? false : true,
+                'maxlength' => 32,
+                'value' => $user['phone1'],
+                'validator' => array('keyup,change', 'checkPhone', 'index.php/index/model/checker/phone'),
+            ));
+        }
         // password, repassword
         $groups = $fieldset->add('groups', array(
             'comment' => '{LNG_To change your password, enter your password to match the two inputs}',
@@ -151,10 +166,11 @@ class View extends \Gcms\View
             'id' => 'register_idcard',
             'labelClass' => 'g-input icon-profile',
             'itemClass' => 'width50',
-            'label' => '{LNG_Identification number}',
+            'label' => '{LNG_Identification No.}',
             'placeholder' => '{LNG_13-digit identification number}',
             'maxlength' => 13,
             'value' => $user['idcard'],
+            'validator' => array('keyup,change', 'checkIdcard', 'index.php/index/model/checker/idcard'),
         ));
         $groups = $fieldset->add('groups');
         // birthday
@@ -176,16 +192,33 @@ class View extends \Gcms\View
             'value' => $user['company'],
         ));
         $groups = $fieldset->add('groups');
-        // phone1
-        $groups->add('tel', array(
-            'id' => 'register_phone1',
-            'labelClass' => 'g-input icon-phone',
-            'itemClass' => 'width50',
-            'label' => '{LNG_Phone}',
-            'maxlength' => 32,
-            'value' => $user['phone1'],
-            'validator' => array('keyup,change', 'checkPhone', 'index.php/index/model/checker/phone'),
-        ));
+        if (!in_array('phone1', self::$cfg->login_fields)) {
+            // phone1
+            $groups->add('tel', array(
+                'id' => 'register_phone1',
+                'itemClass' => 'width50',
+                'labelClass' => 'g-input icon-phone',
+                'label' => '{LNG_Phone}',
+                'disabled' => $login_admin ? false : true,
+                'maxlength' => 32,
+                'value' => $user['phone1'],
+                'validator' => array('keyup,change', 'checkPhone', 'index.php/index/model/checker/phone'),
+            ));
+        }
+        if (!in_array('email', self::$cfg->login_fields)) {
+            // email (แอดมิน และตัวเอง สามารถแก้ไขได้)
+            $groups->add('text', array(
+                'id' => 'register_email',
+                'itemClass' => 'width50',
+                'labelClass' => 'g-input icon-email',
+                'label' => '{LNG_Email}',
+                'comment' => '{LNG_The system will send the registration information to this e-mail. Please use real email address}',
+                'disabled' => $login_admin ? false : true,
+                'maxlength' => 255,
+                'value' => $user['email'],
+                'validator' => array('keyup,change', 'checkEmail', 'index.php/index/model/checker/email'),
+            ));
+        }
         // phone2
         $groups->add('tel', array(
             'id' => 'register_phone2',

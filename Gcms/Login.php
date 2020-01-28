@@ -108,7 +108,7 @@ class Login extends \Kotchasan\Login
             ->toArray();
         $login_result = null;
         foreach ($query->execute() as $item) {
-            if (isset($params['password']) && $item['password'] == sha1($params['password'].$item['salt'])) {
+            if (isset($params['password']) && $item['password'] == sha1(self::$cfg->password_key.$params['password'].$item['salt'])) {
                 // ตรวจสอบรหัสผ่าน
                 $login_result = $item;
                 break;
@@ -195,13 +195,15 @@ class Login extends \Kotchasan\Login
             $model = new \Kotchasan\Model();
             // ตาราง user
             $table = $model->getTableName('user');
-            // ค้นหาอีเมล
-            $search = $model->db()->first($table, array(array($field, $username), array('social', 0)));
+            // Database
+            $db = $model->db();
+            // ค้นหา username
+            $search = $db->first($table, array(array($field, $username), array('social', 0)));
             if ($search === false) {
                 self::$login_message = Language::get('not a registered user');
             } else {
-                // สุ่มรหัสผ่านใหม่
-                $password = substr(uniqid(), 0, 6);
+                // รหัสผ่านใหม่
+                $password = substr(uniqid(), -6);
                 // ข้อมูลอีเมล
                 $replace = array(
                     '/%PASSWORD%/' => $password,
@@ -209,19 +211,20 @@ class Login extends \Kotchasan\Login
                 );
                 // send mail
                 $err = \Gcms\Email::send(3, 'member', $replace, $search->$field);
-                if (!$err->error()) {
+                if ($err->error()) {
+                    // ไม่สำเร็จ
+                    self::$login_message = $err->getErrorMessage();
+                } else {
                     // อัปเดตรหัสผ่านใหม่
+                    $salt = uniqid();
                     $save = array(
-                        'salt' => uniqid(),
+                        'salt' => $salt,
+                        'password' => sha1(self::$cfg->password_key.$password.$salt),
                     );
-                    $save['password'] = sha1($password.$save['salt']);
-                    $model->db()->update($table, (int) $search->id, $save);
+                    $db->update($table, (int) $search->id, $save);
                     // คืนค่า
                     self::$login_message = Language::get('Your message was sent successfully');
                     self::$request = $request->withQueryParams(array('action' => 'login'));
-                } else {
-                    // ไม่สำเร็จ
-                    self::$login_message = $err->getErrorMessage();
                 }
             }
         }

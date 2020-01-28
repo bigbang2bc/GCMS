@@ -41,16 +41,30 @@ class View extends \Gcms\Adminview
         $fieldset = $form->add('fieldset', array(
             'title' => '{LNG_Register}',
         ));
-        // email
-        $fieldset->add('text', array(
-            'id' => 'register_email',
-            'itemClass' => 'item',
-            'labelClass' => 'g-input icon-email',
-            'label' => '{LNG_Email}',
-            'comment' => '{LNG_The system will send the registration information to this e-mail. Please use real email address}',
-            'maxlength' => 255,
-            'validator' => array('keyup,change', 'checkEmail', 'index.php/index/model/checker/email'),
-        ));
+        $groups = $fieldset->add('groups');
+        if (in_array('email', self::$cfg->login_fields)) {
+            // email
+            $groups->add('text', array(
+                'id' => 'register_email',
+                'itemClass' => 'width50',
+                'labelClass' => 'g-input icon-email',
+                'label' => '{LNG_Email}',
+                'comment' => '{LNG_The system will send the registration information to this e-mail. Please use real email address}',
+                'maxlength' => 255,
+                'validator' => array('keyup,change', 'checkEmail', 'index.php/index/model/checker/email'),
+            ));
+        }
+        if (in_array('phone1', self::$cfg->login_fields)) {
+            // phone1
+            $groups->add('tel', array(
+                'id' => 'register_phone1',
+                'itemClass' => 'width50',
+                'labelClass' => 'g-input icon-phone',
+                'label' => '{LNG_Phone}',
+                'maxlength' => 32,
+                'validator' => array('keyup,change', 'checkPhone', 'index.php/index/model/checker/phone'),
+            ));
+        }
         $groups = $fieldset->add('groups');
         // password
         $groups->add('password', array(

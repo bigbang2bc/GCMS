@@ -8,9 +8,22 @@
   <form id=register_frm class=main_frm method=post action="{WEBURL}index.php" autocomplete=off>
     <fieldset>
       <div class=item>
-        <label for=register_email>{LNG_Email}</label>
-        <span class="g-input icon-email"><input type=text name=register_email id=register_email maxlength=255 title="{LNG_The system will send the registration information to this e-mail. Please use real email address}" autofocus></span>
-        <div class=comment id=result_register_email>{LNG_The system will send the registration information to this e-mail. Please use real email address}</div>
+        <div class="input-groups">
+          <EMAIL>
+            <div class=width50>
+              <label for=register_email>{LNG_Email}</label>
+              <span class="g-input icon-email"><input type=text name=register_email id=register_email maxlength=255 title="{LNG_The system will send the registration information to this e-mail. Please use real email address}"></span>
+              <div class=comment id=result_register_email>{LNG_The system will send the registration information to this e-mail. Please use real email address}</div>
+            </div>
+          </EMAIL>
+          <PHONE>
+            <div class=width50>
+              <label for=register_phone1>{LNG_Phone}</label>
+              <span class="g-input icon-phone"><input type=text name=register_phone1 id=register_phone1 maxlength=10 title="{LNG_Please fill in} {LNG_Phone number}" pattern="[0-9]+"></span>
+              <div class=comment id=result_register_phone1>{LNG_Please fill in} {LNG_Phone number}</div>
+            </div>
+          </PHONE>
+        </div>
       </div>
       <div class=item>
         <div class="input-groups">
@@ -26,16 +39,9 @@
           </div>
         </div>
       </div>
-      <PHONE>
-        <div class=item>
-          <label for=register_phone1>{LNG_Phone}</label>
-          <span class="g-input icon-phone"><input type=text name=register_phone1 id=register_phone1 maxlength=10 title="{LNG_Please fill in} {LNG_Phone number}" pattern="[0-9]+"></span>
-          <div class=comment id=result_register_phone1>{LNG_Please fill in} {LNG_Phone number}</div>
-        </div>
-      </PHONE>
       <IDCARD>
         <div class=item>
-          <label for=register_idcard>{LNG_Identification number}</label>
+          <label for=register_idcard>{LNG_Identification No.}</label>
           <span class="g-input icon-profile"><input type=number name=register_idcard id=register_idcard maxlength=13 title="{LNG_Please fill in} {LNG_13-digit identification number}"></span>
           <div class=comment id=result_register_idcard>{LNG_Please fill in} {LNG_13-digit identification number}</div>
         </div>
